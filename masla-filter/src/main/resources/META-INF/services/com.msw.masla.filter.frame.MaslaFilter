@@ -1,0 +1,5 @@
+com.msw.masla.filter.governance.BlackListFilter
+com.msw.masla.filter.governance.CircuitFilter
+com.msw.masla.filter.governance.FlowControlFilter
+com.msw.masla.filter.governance.GlobalBlackListFilter
+com.msw.masla.filter.router.RuleApiRouteFilter

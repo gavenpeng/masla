@@ -1,0 +1,199 @@
+package com.msw.masla.filter.router;
+
+import com.msw.masla.common.constant.Constants;
+import com.msw.masla.common.pojo.ServiceApp;
+import com.msw.masla.common.util.StringUtil;
+import com.msw.masla.core.ServiceIdFormatUtil;
+import com.msw.masla.core.async.context.MaslaAsyncContext;
+import com.msw.masla.core.router.DefaultRouteRuleFactory;
+import com.msw.masla.core.router.rule.RouteRule;
+import com.msw.masla.core.router.rule.RouteRuleCache;
+import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.filter.exception.FilterException;
+import com.msw.masla.filter.frame.MaslaFilter;
+import com.msw.masla.filter.frame.MaslaFilterChain;
+import com.msw.masla.metrics.http.AppRequestFailedMetrics;
+import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.event.BaseEvent;
+import com.msw.masla.protocol.http.netty.session.IOSession;
+import io.netty.handler.codec.DecoderResult;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
+/**
+ * Author: Gavin.peng
+ * Date: 2024/7/28
+ * Description:
+ * route server base rule of properties
+ */
+@Slf4j
+public class RuleApiRouteFilter implements MaslaFilter {
+
+    private DefaultRouteRuleFactory defaultRouteRuleFactory;
+
+    private static final long MAX_REQ_LINE_LENGTH = 4096l;
+
+    @Override
+    public String mappingPath() {
+        return "/*";
+    }
+
+    @Override
+    public void doFilter(ChannelContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event, MaslaFilterChain filterChain) throws FilterException {
+
+        HttpRequest httpRequest = context.getHttpRequest();
+
+        String host = null;
+        Integer port = 80;
+        String hearderHost = httpRequest.headers().get(HttpHeaderNames.HOST);
+        if (hearderHost != null) {
+            String[] hostPort = hearderHost.split(":");
+            host = hostPort[0];
+            if (hostPort.length == 2) {
+                port = Integer.valueOf(hostPort[1]);
+            }
+        }
+
+        String contextRoot = context.getSession().getContextRoot();
+        String path = context.getSession().getPath();
+
+
+        DefaultRouteRuleFactory routeRuleFactory = DefaultRouteRuleFactory.getDefaultRouteRuleFactoryInstance();
+        RouteRuleCache routeRuleCache = routeRuleFactory.getRouteRuleCache();
+        RouteRule routeRule = null;
+
+        String requestPath = contextRoot + path;
+        //first direct match with path;
+        RouteRule rule = RouteRuleCache.getDirectRouteRuleCache().get(requestPath);
+        if (rule == null) {
+            //second pattern match with path
+            Map<String, TreeMap<Pattern, RouteRule>> routeRulePattern =  RouteRuleCache.getAppPatterRouteRule();
+            TreeMap<Pattern, RouteRule> appRouteRule = routeRulePattern.get(contextRoot);
+            if (appRouteRule != null) {
+                Set<Map.Entry<Pattern, RouteRule>> rulePatterSet = appRouteRule.entrySet();
+                for (Map.Entry<Pattern, RouteRule> entry : rulePatterSet) {
+                    if (entry.getKey().matcher(requestPath).find()) {
+                        //判断是否是后端无容器的请求
+                        rule = entry.getValue();
+                        break;
+                    }
+
+                }
+            }
+
+        }
+
+        //three match with domain
+        if (rule == null) {
+            rule = RouteRuleCache.getDirectRouteRuleCache().get(host);
+        }
+
+        if (rule == null) {
+            writeUNValidRouteUrl(context);
+            return;
+        }
+
+
+
+        ServiceApp appDO = RouteRuleCache.getRouteAppCache(routeRule.getAppName());
+
+        MaslaAsyncContext maslaAsyncContext = (MaslaAsyncContext) context;
+        maslaAsyncContext.setRouteRule(routeRule);
+        maslaAsyncContext.setAppDO(appDO);
+        maslaAsyncContext.setTimeout(routeRule.getTimeout());
+        if (StringUtil.isEmptyString(rule.getRewritePath())) {
+            maslaAsyncContext.setRewritePath(rule.getRewritePath());
+        }
+
+        String serviceIdentify = null;
+
+
+
+        //支持url自定义规则
+        String reqPath = path.length() > 0 ? path : contextRoot;
+        serviceIdentify = ServiceIdFormatUtil.formatServerId(path, context);
+        if(ServiceIdFormatUtil.isUNvalidUrl(reqPath)){
+            serviceIdentify = Constants.UNVALID_SERVICE_PATH;
+        }else if(reqPath.endsWith(Constants.ICO_REQUEST)||
+                reqPath.equals(Constants.HTTP_SCHEMA)){
+            serviceIdentify =  reqPath;
+        }
+
+        maslaAsyncContext.setServiceIdentify(serviceIdentify);
+
+        if (!checkDecodeResult(context,appDO)){
+            return;
+        }
+
+        try {
+            filterChain.doFilter(context, event);
+        } catch (FilterException e) {
+            log.error("Masla do NettyApiMatchFilter failed:", e);
+            throw e;
+        }
+
+    }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void order() {
+
+    }
+
+
+    private boolean checkDecodeResult(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
+        try {
+
+            int requestLineLength = requestContext.getRequestLineSize();
+
+            if (requestLineLength > MAX_REQ_LINE_LENGTH){
+                try {
+                    writeHttpDecodeErrorResponse(requestContext, AppRequestFailedMetrics.REQ_LINE_TOO_LONG);
+                }finally {
+                    requestContext.recycle();
+                }
+                return false;
+            }else {
+                DecoderResult decoderResult = requestContext.getHttpRequest().decoderResult();
+                if (decoderResult != null && decoderResult.isFailure()) {
+                    Throwable cause = decoderResult.cause();
+                    try {
+                        String message = cause.getMessage();
+                        writeHttpDecodeErrorResponse(requestContext, message);
+                    } finally {
+                        requestContext.recycle();
+                    }
+                    return false;
+                }
+            }
+
+        }catch(Throwable e){
+            log.error("Masla check request {} decode result failed:",requestContext.getRequestUrl(),e);
+        }
+        return true;
+    }
+
+    private void writeHttpDecodeErrorResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext,String message) {
+        requestContext.getSession().writeAndClose(
+                NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, message, Constants.MASLA_RESPONSE_HEADER_PROTOCOL_EXCEPTION));
+    }
+
+    private void writeUNValidRouteUrl(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext) {
+        String unvalidRoute = "Not found service by request url:" + requestContext.getRequestUrl();
+        requestContext.getSession().writeAndClose(
+                NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, unvalidRoute, Constants.MASLA_RESPONSE_HEADER_UNVALID_PATH));
+    }
+
+}

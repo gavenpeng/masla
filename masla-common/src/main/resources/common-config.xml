@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+<!--        <typeAlias alias="userDO" type="com.msw.masla.common.pojo.UserDO" />-->
+<!--        <typeAlias alias="apiDO" type="com.msw.masla.common.pojo.ServiceApi" />-->
+<!--        <typeAlias alias="appDO" type="com.msw.masla.common.pojo.ServiceApp" />-->
+    </typeAliases>
+
+</configuration>

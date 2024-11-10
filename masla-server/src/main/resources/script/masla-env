@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+# set environment variables here
+export MASLA_HEAPSIZE=4000
