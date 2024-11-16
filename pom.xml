@@ -26,7 +26,6 @@
     <serialization.version>0.0.6</serialization.version>
     <guava.version>18.0</guava.version>
     <ibatis.version>2.3.4.726</ibatis.version>
-    <c3p0.version>0.9.1.2</c3p0.version>
     <mysql.driver.version>8.0.21</mysql.driver.version>
     <servlet.api.version>2.3</servlet.api.version>
     <codec.version>1.6</codec.version>
@@ -34,9 +33,7 @@
     <http.client.version>4.3.5</http.client.version>
     <fastjson.version>1.2.73</fastjson.version>
 
-    <c3p0.version>0.9.1.2</c3p0.version>
     <spring.mybatis.version>1.2.0</spring.mybatis.version>
-    <aspectj.version>1.7.3</aspectj.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <mysql-connector-java.version>5.1.36</mysql-connector-java.version>
     <json-lib.version>2.4</json-lib.version>
