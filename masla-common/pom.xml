@@ -18,141 +18,115 @@
       <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <version>1.7.7</version>
       </dependency>
       <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
-          <version>1.7.7</version>
       </dependency>
       <dependency>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
-          <version>1.2.17</version>
       </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.5</version>
         </dependency>
         <dependency>
 		    <groupId>commons-codec</groupId>
 		    <artifactId>commons-codec</artifactId>
-		    <version>1.10</version>
 		</dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>${javax.servlet--servlet-api}</version>
         </dependency>
       <dependency>
           <groupId>org.lazyluke</groupId>
           <artifactId>log4jdbc-remix</artifactId>
-          <version>0.2.7</version>
       </dependency>
       <dependency>
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
-          <version>${mysql.driver.version}</version>
       </dependency>
       <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-core</artifactId>
-          <version>${spring.version}</version>
       </dependency>
       <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-jdbc</artifactId>
-          <version>${spring.version}</version>
       </dependency>
       <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-context</artifactId>
-          <version>${spring.version}</version>
       </dependency>
       <dependency>
           <groupId>org.mybatis</groupId>
           <artifactId>mybatis</artifactId>
-          <version>${mybatis.version}</version>
       </dependency>
       <dependency>
           <groupId>org.mybatis</groupId>
           <artifactId>mybatis-spring</artifactId>
-          <version>${mybatis-spring.version}</version>
       </dependency>
 
       <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
-          <version>3.8</version>
       </dependency>
 
       <dependency>
           <groupId>com.alibaba.nacos</groupId>
           <artifactId>nacos-spring-context</artifactId>
-          <version>1.1.2</version>
       </dependency>
 
       <dependency>
           <groupId>org.hdrhistogram</groupId>
           <artifactId>HdrHistogram</artifactId>
-          <version>2.1.9</version>
       </dependency>
       <dependency>
           <groupId>org.projectlombok</groupId>
           <artifactId>lombok</artifactId>
-          <version>1.16.20</version>
           <scope>provided</scope>
       </dependency>
 
       <dependency>
           <groupId>org.influxdb</groupId>
           <artifactId>influxdb-java</artifactId>
-          <version>2.5</version>
       </dependency>
       <dependency>
           <groupId>com.ibeetl</groupId>
           <artifactId>beetl</artifactId>
-          <version>2.5.0</version>
       </dependency>
 
       <dependency>
           <groupId>commons-httpclient</groupId>
           <artifactId>commons-httpclient</artifactId>
-          <version>3.1</version>
       </dependency>
 
       <dependency>
           <groupId>org.apache.curator</groupId>
           <artifactId>curator-recipes</artifactId>
-          <version>5.2.1</version>
       </dependency>
 
 
       <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpmime</artifactId>
-          <version>4.3</version>
       </dependency>
       <dependency>
           <groupId>org.codehaus.jackson</groupId>
           <artifactId>jackson-core-asl</artifactId>
-          <version>${codehaus.jackson.version}</version>
       </dependency>
       <dependency>
           <groupId>org.codehaus.jackson</groupId>
           <artifactId>jackson-mapper-asl</artifactId>
-          <version>${codehaus.jackson.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-pool2</artifactId>
-          <version>${commons.pool2.version}</version>
       </dependency>
   </dependencies>
     <build>
