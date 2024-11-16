@@ -8,14 +8,6 @@
         </layout>
     </appender>
 
-    <category name="com.ximalaya.common.auth.gateway.config.GatewayConfigLoader">
-        <priority value="error"/>
-    </category>
-
-    <category name="io.netty">
-        <priority value="debug"/>
-    </category>
-
     <category name="com.msw.masla.protocol.http.netty">
         <priority value="debug"/>
     </category>
