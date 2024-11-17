@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.msw.masla.server.http.processor;
+package com.msw.masla.server.processor;
 
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;

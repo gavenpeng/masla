@@ -34,17 +34,6 @@ fi
 mkdir -p "$MASLA_LOG_DIR"
 mkdir -p "$MASLA_PID_DIR"
 
-MASLA_OPTS="$MASLA_OPTS $JAVA_HEAP_MIN $JAVA_HEAP_MAX -XX:PermSize=256M -XX:MaxPermSize=256M -Xmn1500M -Xss256k -XX:SurvivorRatio=2 -XX:MaxTenuringThreshold=6 -XX:+UseCondCardMark"
-MASLA_OPTS="$MASLA_OPTS -XX:ParallelCMSThreads=4 -XX:+UseConcMarkSweepGC  -XX:+CMSParallelRemarkEnabled -XX:+CMSClassUnloadingEnabled -XX:CMSFullGCsBeforeCompaction=2 -XX:+CMSScavengeBeforeRemark -XX:+HeapDumpOnOutOfMemoryError"
-MASLA_OPTS="$MASLA_OPTS -XX:+UseParNewGC -XX:+ExplicitGCInvokesConcurrent -XX:CMSInitiatingOccupancyFraction=70 -XX:SoftRefLRUPolicyMSPerMB=0"
-MASLA_OPTS="$MASLA_OPTS -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
-MASLA_OPTS="$MASLA_OPTS -Xloggc:$MASLA_LOG_DIR/masla-server-gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=1 -XX:GCLogFileSize=512M"
-
-
-CLASSPATH=$JAVA_HOME/lib/tools.jar
-CLASSPATH=${CLASSPATH}:$MASLA_HOME/conf
-CLASSPATH=${CLASSPATH}:$MASLA_HOME/ssl
-
 
 if [ "$1" = "start" ] ; then
 
@@ -59,14 +48,9 @@ if [ "$1" = "start" ] ; then
   echo "`date` Starting masla Server on `hostname`" >> $loglog
   echo "`ulimit -a`" >> $loglog 2>&1
 
-  CLASS='com.msw.masla.MaslaServer'
-  for f in $MASLA_HOME/libs/*.jar; do
-    CLASSPATH=${CLASSPATH}:$f;
-  done
+#  exec "$JAVA" -XX:OnOutOfMemoryError="kill -9 %p" $MASLA_OPTS -classpath "$CLASSPATH" $CLASS "$@"
 
-  exec "$JAVA" -XX:OnOutOfMemoryError="kill -9 %p" $MASLA_OPTS -classpath "$CLASSPATH" $CLASS "$@"
-
-  #nohup nice -n $MASLA_NICENESS sh "$MASLA_HOME"/masla.sh "$@" > "$logout" 2>&1 < /dev/null &
+  nohup nice -n $MASLA_NICENESS sh "$MASLA_HOME"/masla.sh "$@" > "$logout" 2>&1 < /dev/null &
   echo $! > $pid
 
 elif [ "$1" = "stop" ]; then

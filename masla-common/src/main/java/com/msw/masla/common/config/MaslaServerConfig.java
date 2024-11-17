@@ -114,11 +114,6 @@ public class MaslaServerConfig {
     private String maslaCollectorServerAddress;
 
 
-    public void setMaxConnections(Integer maxConnections) {
-        this.maxConnections = maxConnections;
-    }
-
-
     public void setPort(Integer port) {
         this.port = port;
     }

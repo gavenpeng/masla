@@ -6,7 +6,7 @@ import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "192.168.1.12:8858", username = "nacos", password = "nacos", namespace = "public"))
+@EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}", username = "${nacos.username}", password = "${nacos.password:nacos}", namespace = "${nacos.namespace:public}"))
 @NacosPropertySource(dataId = "masla.properties", autoRefreshed = true)
 public class NacosConfiguration {
 

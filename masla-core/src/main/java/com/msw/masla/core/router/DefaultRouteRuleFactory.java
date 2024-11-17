@@ -2,6 +2,7 @@ package com.msw.masla.core.router;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.msw.masla.core.discovery.nacos.MaslaNacosServiceDiscovery;
+import com.msw.masla.core.router.config.NacosRouteConfig;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.core.router.rule.RouteRule;
 import com.msw.masla.core.router.rule.RouteRuleCache;
@@ -22,6 +23,8 @@ public class DefaultRouteRuleFactory {
 
     private MaslaNacosServiceDiscovery maslaNacosServiceDiscovery;
 
+    private NacosRouteConfig nacosRouteConfig;
+
     private final RouteRuleCache routeRuleCache;
 
     private final RouteRuleParse routeRuleParse;
@@ -37,13 +40,19 @@ public class DefaultRouteRuleFactory {
         this.routeRuleCache = new RouteRuleCache();
     }
 
+    public void intRouteRuleFile() throws Exception{
+        this.nacosRouteConfig = new NacosRouteConfig();
+        this.nacosRouteConfig.init();
+        this.loadRouteRule();
+    }
+
     public List<RouteRule> getRouteRule() {
         return maslaRouteRuleProperties.getRoutes();
     }
 
-    private void loadRouteRule() {
-        String routeFileName = MaslaRouteRuleProperties.MASLA_GATEWAY_ROUTE_RULE_FILE_NAME;
-        List<RouteRule> routeRules = routeRuleParse.parseRouteRule(routeFileName);
+    private void loadRouteRule() throws Exception {
+        //String routeFileName = MaslaRouteRuleProperties.MASLA_GATEWAY_ROUTE_RULE_FILE_NAME;
+        List<RouteRule> routeRules = routeRuleParse.parseRouteRule(nacosRouteConfig.getRouteProperties());
         this.routeRuleCache.refreshApiCache(routeRules);
     }
 

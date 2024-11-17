@@ -1,4 +1,4 @@
-package com.msw.masla.server.http;
+package com.msw.masla.server;
 
 import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
@@ -11,12 +11,12 @@ import com.msw.masla.protocol.http.netty.exception.MaslaException;
 import com.msw.masla.protocol.http.netty.factory.MaslaEventLoopGroupFactory;
 import com.msw.masla.core.utils.NettyCommonUtil;
 import com.msw.masla.protocol.http.netty.util.BufferUtils;
-import com.msw.masla.server.http.handler.MaslaServerChannelHandler;
+import com.msw.masla.server.handler.MaslaServerChannelHandler;
 import com.msw.masla.protocol.http.netty.http.handler.MaslaServerHttpRequestDecode;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.protocol.http.netty.ssl.BaseSslContextFactory;
 import com.msw.masla.protocol.http.netty.ssl.ServerSslConfig;
-import com.msw.masla.server.http.ssl.MaslaChannelInitialier;
+import com.msw.masla.server.ssl.MaslaChannelInitialier;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -36,7 +36,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Gavin.peng on 2017/9/25.
+ * Created by Gavin.peng on 2023/9/25.
  */
 public class MaslaMultiProtocolServer extends AbstractEndpoint {
 

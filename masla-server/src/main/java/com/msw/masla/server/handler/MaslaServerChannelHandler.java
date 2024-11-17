@@ -1,16 +1,15 @@
-package com.msw.masla.server.http.handler;
+package com.msw.masla.server.handler;
 
 import com.msw.masla.common.constant.Constants;
-import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.protocol.http.netty.http.handler.AbstractServerChannelHandler;
 import com.msw.masla.protocol.http.netty.pool.SynchronizedStack;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.protocol.http.netty.session.MaslaSession;
-import com.msw.masla.server.http.AbstractEndpoint;
-import com.msw.masla.server.http.dispatch.MaslaDispatch;
-import com.msw.masla.server.http.processor.MaslaProcessorBase;
+import com.msw.masla.server.dispatch.MaslaDispatch;
+import com.msw.masla.server.AbstractEndpoint;
+import com.msw.masla.server.processor.MaslaProcessorBase;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;

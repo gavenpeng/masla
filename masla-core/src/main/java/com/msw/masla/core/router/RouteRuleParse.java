@@ -4,6 +4,7 @@ import com.msw.masla.core.router.rule.RouteRule;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Author: Gavin.peng
@@ -12,5 +13,7 @@ import java.util.List;
  */
 public interface RouteRuleParse {
 
-    public List<RouteRule> parseRouteRule(String routeFile);
+    public List<RouteRule> parseRouteRule(Properties properties) throws Exception;
+
+    public List<RouteRule> parseRouteRule(String routeFile) throws Exception;
 }

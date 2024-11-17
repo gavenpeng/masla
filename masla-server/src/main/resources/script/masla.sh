@@ -22,6 +22,7 @@ fi
 JAVA_HEAP_MAX=2g
 JAVA_HEAP_MIN=2g
 
+
 # check envvars which might override default args
 if [ "$MASLA_HEAPSIZE" != "" ]; then
   SUFFIX="m"
@@ -43,6 +44,26 @@ MASLA_OPTS="$MASLA_OPTS -XX:ParallelCMSThreads=4 -XX:+UseConcMarkSweepGC  -XX:+C
 MASLA_OPTS="$MASLA_OPTS -XX:+UseParNewGC -XX:+ExplicitGCInvokesConcurrent -XX:CMSInitiatingOccupancyFraction=70 -XX:SoftRefLRUPolicyMSPerMB=0"
 MASLA_OPTS="$MASLA_OPTS -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCMSCompactAtFullCollection -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
 MASLA_OPTS="$MASLA_OPTS -Xloggc:$MASLA_LOG_DIR/masla-server-gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=1 -XX:GCLogFileSize=512M"
+
+
+#Nacos config
+DEFAULT_SERVER_ADDR="127.0.0.1:8848"
+DEFAULT_USERNAME="nacos"
+DEFAULT_PASSWORD="nacos"
+DEFAULT_NAMESPACE="public"
+
+# 从环境变量或命令行参数读取 Nacos 配置（如果没有传入则使用默认值）
+NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-$DEFAULT_SERVER_ADDR}
+NACOS_USERNAME=${NACOS_USERNAME:-$DEFAULT_USERNAME}
+NACOS_PASSWORD=${NACOS_PASSWORD:-$DEFAULT_PASSWORD}
+NACOS_NAMESPACE=${NACOS_NAMESPACE:-$DEFAULT_NAMESPACE}
+
+# 添加 Nacos 的 JVM 参数
+MASLA_OPTS="$MASLA_OPTS -Dnacos.server-addr=$NACOS_SERVER_ADDR"
+MASLA_OPTS="$MASLA_OPTS -Dnacos.username=$NACOS_USERNAME"
+MASLA_OPTS="$MASLA_OPTS -Dnacos.password=$NACOS_PASSWORD"
+MASLA_OPTS="$MASLA_OPTS -Dnacos.namespace=$NACOS_NAMESPACE"
+
 
 #JMX_PORT=3998
 

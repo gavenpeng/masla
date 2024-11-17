@@ -1,10 +1,10 @@
-package com.msw.masla.server.http.ssl;
+package com.msw.masla.server.ssl;
 
 import com.msw.masla.protocol.http.netty.codec.MaslaHttpObjectAggregator;
 import com.msw.masla.protocol.http.netty.config.ChannelConfig;
 import com.msw.masla.protocol.http.netty.http.handler.MaslaServerHttpRequestDecode;
 import com.msw.masla.protocol.http.netty.ssl.AbstractHttp2SslChannelInitializer;
-import com.msw.masla.server.http.handler.MaslaServerChannelHandler;
+import com.msw.masla.server.handler.MaslaServerChannelHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.group.ChannelGroup;

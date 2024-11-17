@@ -1,9 +1,8 @@
-package com.msw.masla.server.http.dispatch;
+package com.msw.masla.server.dispatch;
 
 
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.util.CollectionUtil;
-import com.msw.masla.common.util.HealthCheckUtils;
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.core.async.context.MaslaRequestContextBuilder;
 import com.msw.masla.core.utils.NettyCommonUtil;
@@ -13,7 +12,7 @@ import com.msw.masla.filter.frame.MaslaFilter;
 import com.msw.masla.protocol.http.netty.context.ChannelContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
-import com.msw.masla.server.http.AbstractEndpoint;
+import com.msw.masla.server.AbstractEndpoint;
 import com.msw.masla.filter.factory.MaslaFilterBeanFactory;
 import com.msw.masla.filter.servlet.MaslaServlet;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -119,7 +118,7 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
             return;
         }
 
-        MaslaDefaultFilterChain filterChain = new MaslaDefaultFilterChain(matcherFilter.toArray(new MaslaFilter[0]),servlet);
+        MaslaDefaultFilterChain filterChain = new MaslaDefaultFilterChain(matcherFilter.toArray(new MaslaFilter[0]), servlet);
         reqContext.setRequestPath(requestPath);
         reqContext.getSession().addKeepaliveRequest();
         try {

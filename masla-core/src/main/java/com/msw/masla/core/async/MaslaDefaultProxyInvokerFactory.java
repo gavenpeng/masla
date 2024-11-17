@@ -12,6 +12,7 @@ import com.msw.masla.core.invoker.loadbalance.ConsistentHashLoadBalance;
 import com.msw.masla.core.invoker.loadbalance.LoadBalanceFactory;
 import com.msw.masla.core.invoker.loadbalance.MaslaDefaultLoadBalanceFactory;
 import com.msw.masla.core.invoker.loadbalance.RoundRobinLoadBalance;
+import com.msw.masla.core.router.DefaultRouteRuleFactory;
 import com.msw.masla.protocol.http.netty.config.NettyConfig;
 import com.msw.masla.protocol.http.netty.http.HostInstance;
 import com.msw.masla.protocol.http.netty.http.connection.MaslaChannelPoolManager;
@@ -120,6 +121,10 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
 		LoadBalanceFactory<HostInstance> loadBalanceFactory = MaslaDefaultLoadBalanceFactory.getInstance();
 		loadBalanceFactory.registerLoadBalance(new RoundRobinLoadBalance());
 		loadBalanceFactory.registerLoadBalance(new ConsistentHashLoadBalance());
+
+		//init masla api route properties
+		DefaultRouteRuleFactory routeRuleFactory = DefaultRouteRuleFactory.getDefaultRouteRuleFactoryInstance();
+		routeRuleFactory.intRouteRuleFile();
 
 	}
 

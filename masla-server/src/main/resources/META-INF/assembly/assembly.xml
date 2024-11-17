@@ -33,9 +33,6 @@
             <directory>${project.basedir}/src/main/resources/script</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-				<!--
-                <include>config.sh</include>
-                -->
                 <include>*.sh</include>
 				<include>masla-env</include>
             </includes>

@@ -1,14 +1,13 @@
-package com.msw.masla.server.http;
+package com.msw.masla.server;
 
 
-import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.protocol.http.netty.config.NettyConfig;
 import com.msw.masla.protocol.http.netty.util.SystemUtil;
-import com.msw.masla.server.http.dispatch.MaslaDispatch;
-import com.msw.masla.server.http.processor.AcceptQueue;
-import com.msw.masla.server.http.processor.MaslaThreadPoolExecutor;
-import com.msw.masla.server.http.processor.WorkerThreadFactory;
+import com.msw.masla.server.dispatch.MaslaDispatch;
+import com.msw.masla.server.processor.AcceptQueue;
+import com.msw.masla.server.processor.MaslaThreadPoolExecutor;
+import com.msw.masla.server.processor.WorkerThreadFactory;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -32,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by Gavin.peng on 2017/9/25.
+ * Created by Gavin.peng on 2023/9/25.
  */
 public abstract class AbstractEndpoint {
 

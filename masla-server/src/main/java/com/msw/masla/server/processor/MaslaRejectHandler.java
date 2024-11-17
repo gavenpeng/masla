@@ -1,4 +1,4 @@
-package com.msw.masla.server.http.processor;
+package com.msw.masla.server.processor;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;

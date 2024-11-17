@@ -1,4 +1,4 @@
-package com.msw.masla.server.http.processor;
+package com.msw.masla.server.processor;
 
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.FullHttpRequest;

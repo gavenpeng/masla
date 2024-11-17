@@ -1,4 +1,4 @@
-package com.msw.masla.server.http;
+package com.msw.masla.server;
 
 import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
@@ -11,7 +11,7 @@ import com.msw.masla.common.constant.Constants;
 
 import java.util.*;
 
-import com.msw.masla.server.http.dispatch.MaslaServerDispatch;
+import com.msw.masla.server.dispatch.MaslaServerDispatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
