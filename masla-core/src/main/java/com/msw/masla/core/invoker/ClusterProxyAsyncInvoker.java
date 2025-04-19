@@ -40,6 +40,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.GenericProgressiveFutureListener;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Gavin.peng on 2024/5/22.
  */
+@Data
 public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
 
     protected static final Logger LOG = LoggerFactory.getLogger(ClusterProxyAsyncInvoker.class);
@@ -86,11 +88,6 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    public long getTimeout() {
-        return timeout;
-    }
-
-
     @Override
     public void doInvoke(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext) {
         HttpRequest httpRequest = maslaContext.getHttpRequest();
@@ -101,7 +98,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
             List<HostInstance> tagList = maslaNacosServiceDiscovery.getAvailableInstances(serviceApp.getName(), true);
             //selected instance by load balance
             LoadBalance<HostInstance> loadBalance = loadBalanceFactory.getLoadBalance(serviceApp.getLoadBalanceName());
-            HostInstance hostInstance = loadBalance.select(instanceList, tagList, maslaContext.getRequestHost());
+            HostInstance hostInstance = loadBalance.select(instanceList, tagList, maslaContext.getRouteTag());
             //get channel pool with selected instance
             MaslaChannelPool channelPool = maslaChannelPoolManager.getChannelPool(hostInstance, serviceApp);
             BaseEvent event = maslaContext.getEvent();
@@ -158,7 +155,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
                 }
             }
         }catch (Throwable e){
-            LOG.error("CountQueueFull failed",e);
+            LOG.error("Masla statics CountQueueFull failed",e);
         }
     }
 
@@ -171,6 +168,8 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
             event.setStartSendTime(System.nanoTime());
 
             if(channel.isActive()) {
+                maslaContext.setRouteHost(channelPool.getHostInstance().getHost());
+                QpsMetrics.recordQpsMertic(maslaContext.getServiceIdentify(), maslaContext.getService() ,channelPool.getHostInstance().getHost(), maslaContext.isStressRequest());
                 MaslaHttpClientHandler handler = (MaslaHttpClientHandler) channel.pipeline().get(MaslaHttpClientHandler.MASLA_NETTY_CLIENT_HANDLE);
                 if(handler != null) {
                     if (handler.getMaslaDecode() == null) {
@@ -314,7 +313,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
         if(LOG.isWarnEnabled()) {
             LOG.warn("Masla exec request {} status {} exec count {} async failed:", maslaContext.getRequestUrl(), event.getState(), event.getExecCount(), e);
         }
-        QpsMetrics.recordQpsMertic(maslaContext.getServiceIdentify(), maslaContext.getService() ,maslaContext.getRequestHost(), false);
+        QpsMetrics.recordQpsMertic(maslaContext.getServiceIdentify(), maslaContext.getService() ,pool.getHostInstance().getHost(), maslaContext.isStressRequest());
         long now = System.nanoTime();
         event.setStartSendTime(now);
         event.setSendCompleteTime(now);
@@ -413,7 +412,6 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
                 return;
             }
 
-            maslaContext.setRequestfHost(channelPool.getHostInstance().getHost());
             if(future.isSuccess()) {
                 //获取连接成功
                 sendRequest(this.httpRequest, this.channelPool, maslaContext,future.getNow(),event);

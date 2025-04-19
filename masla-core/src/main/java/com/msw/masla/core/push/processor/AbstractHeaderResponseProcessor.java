@@ -11,24 +11,24 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 
 /**
- * Created by Gavin.peng on 2017/6/16.
+ * Created by Gavin.peng on 2023/6/16.
  */
-public abstract class AbstractHeaderResponseProcessor extends BaseResponseProcessor {
+public abstract class AbstractHeaderResponseProcessor extends BaseResponseProcessor<HttpResponse> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractHeaderResponseProcessor.class);
 
 
     @Override
-    protected void processHeader(ChannelContext requestContext, BaseEvent event) throws Throwable {
+    protected void processHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         this.processResponseHeader(requestContext,event);
     }
 
     @Override
-    protected void processBody(ChannelContext requestContext, BaseEvent event, ByteArrayOutputStream os) throws Throwable {
+    protected void processBody(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable {
 
     }
 
 
-    protected abstract void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws Throwable;
+    protected abstract void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
 
 }

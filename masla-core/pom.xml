@@ -76,6 +76,7 @@
     <dependency>
       <groupId>com.msw.masla</groupId>
       <artifactId>masla-remote-http</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>com.msw.masla</groupId>

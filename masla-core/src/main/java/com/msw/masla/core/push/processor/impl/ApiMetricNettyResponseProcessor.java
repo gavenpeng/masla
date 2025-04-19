@@ -8,10 +8,9 @@ import com.msw.masla.common.monitor.metrics.BandwidthCount;
 import com.msw.masla.common.util.IpUtil;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.common.util.StringUtil;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.core.push.processor.AbstractHeaderResponseProcessor;
-
+import com.msw.masla.protocol.http.netty.context.ChannelContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.metrics.http.DomainMetrics;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
@@ -36,7 +35,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
 
 
     @Override
-    public void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws Throwable {
+    public void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         try{
             long now = TimeUnit.NANOSECONDS.toMillis(System.nanoTime());
 
@@ -44,13 +43,13 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
                 String serviceId = requestContext.getServiceIdentify();
                 ServiceApp appDO = requestContext.getService();
                 long totalCost = now - event.getStart();
-                long serverCostTime = -1l;
+                long serverCostTime = -1L;
                 long accquireTime = event.getStartSendTime() - event.getStartAcquireConnTime();
                 long pushTime = 0;
                 if(event.getResponseCompleteTime() >0){
                     pushTime = now - event.getResponseCompleteTime();
                 }
-                ApiMetric apiMetric = appDO.getApiMetricByServiceIdAndHost(serviceId, requestContext.getRequestHost());
+                ApiMetric apiMetric = appDO.getApiMetricByServiceIdAndHost(serviceId, requestContext.getRouteHost());
                 if(apiMetric == null){
                     if(LOG.isDebugEnabled()){
                         LOG.debug("Masla found request {} not found api metric,so not record metric",requestContext.getRequestUrl());
@@ -138,7 +137,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
                             apiMetric.getSlowNums().incrementAndGet();
                         }
                         if (serverCostTime > 0) {
-                            requestContext.getService().collectResponseTime(requestContext.getRequestHost(), serviceId, serverCostTime);
+                            requestContext.getService().collectResponseTime(requestContext.getRouteHost(), serviceId, serverCostTime);
                         }
                         if(event.getResult() != null && !requestContext.getSession().getChannel().isActive()){
                             long proxyTime = totalCost - accquireTime-serverCostTime;
@@ -159,8 +158,8 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
 
     /**
      * 入站带宽和域名级别的qps统计
-     * @param requestContext
-     * @param appDO
+     * @param requestContext async  request context
+     * @param appDO request service
      */
     private void staticsDomainBandwidth(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
         try {
@@ -168,7 +167,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
             int totalBandWidthSize = 0;
             int requestLineLength = requestContext.getRequestLineSize();
             int requestHeaderLength = requestContext.getRequestHeaderSize();
-            Integer requestBodyLength = requestContext.getRequestBodySize();
+            int requestBodyLength = requestContext.getRequestBodySize();
 
 
             FullHttpResponse httpResponse = (FullHttpResponse) requestContext.getEvent().getResult();
@@ -195,7 +194,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
 
             boolean isRetry = false;
 
-            Integer sessionType = SessionType.HTTP.ordinal();
+            int sessionType = SessionType.HTTP.ordinal();
             Object serverProtocol = requestContext.getHeaders().get(Constants.HTTPS_PROTOCOL_HEADER_KEY);
             if(serverProtocol != null && Constants.HTTPS1_PROTOCOL_HEADER_KEY_VALUE.equals(serverProtocol.toString())){
                 sessionType = SessionType.HTTPS1.ordinal();
@@ -246,10 +245,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
             return false;
         }
         // 判断是否是ipv6
-        if (IpUtil.isIPv6Address(realIp)) {
-            return true;
-        }
-        return false;
+        return IpUtil.isIPv6Address(realIp);
     }
 
     @Override

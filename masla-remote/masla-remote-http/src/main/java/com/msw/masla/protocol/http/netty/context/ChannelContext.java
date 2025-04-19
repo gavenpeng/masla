@@ -1,19 +1,21 @@
 package com.msw.masla.protocol.http.netty.context;
 
-import com.msw.masla.common.pojo.ParameterRewriteDO;
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.enums.RequestDispatchMode;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
+import com.msw.masla.protocol.http.netty.session.IOSession;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.util.AttributeKey;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Created by Gavin.peng on 2017/6/15.
+ * Created by Gavin.peng on 2023/6/15.
  */
 public interface ChannelContext<S , T , R> {
 
-    AttributeKey<ChannelContext> CONTEXT_KEY = AttributeKey.newInstance("channelContext");
+    AttributeKey<ChannelContext<IOSession, HttpRequest, HttpResponse>> CONTEXT_KEY = AttributeKey.newInstance("channelContext");
 
     T getHttpRequest();
 
@@ -39,25 +41,29 @@ public interface ChannelContext<S , T , R> {
 
     String getServiceIdentify();
 
-    BaseEvent getEvent();
+    BaseEvent<HttpResponse> getEvent();
 
     //请求path
      String getRequestUrl();
 
      String getRewritePath();
 
-    String getRequestHost();
+    String getRouteTag();
 
-    void setRequestfHost(String host);
+    void setRouteHost(String host);
 
-    void setRequestCopyHost(String copyHost);
+    String getRouteHost();
+
+    void setRouteTag(String routeTag);
+
+    boolean isStressRequest();
 
     void fillCookies();
 
      long getTimeout();
 
      //请求相关的任务，有Timeout task
-     void setScheduledFuture(ScheduledFuture scheduledFuture);
+     void setScheduledFuture(ScheduledFuture<?> scheduledFuture);
 
      //请求相关的任务，有Timeout task
      ScheduledFuture<?> getScheduledFuture();
@@ -75,8 +81,8 @@ public interface ChannelContext<S , T , R> {
 
     Map<String, String> getCookie();
 
-  public int getResponseContentLength();
+   int getResponseContentLength();
 
-  public void setResponseContentLength(int responseContentLength);
+   void setResponseContentLength(int responseContentLength);
 
 }

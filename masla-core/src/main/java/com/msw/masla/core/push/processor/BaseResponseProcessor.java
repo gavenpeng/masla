@@ -2,6 +2,9 @@ package com.msw.masla.core.push.processor;
 
 import com.msw.masla.protocol.http.netty.context.ChannelContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
+import com.msw.masla.protocol.http.netty.session.IOSession;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -9,11 +12,11 @@ import java.io.OutputStream;
 /**
  * Created by Gavin.peng on 2017/6/6.
  */
-public abstract class BaseResponseProcessor<T> implements ResponseProcessor<ChannelContext, BaseEvent> {
+public abstract class BaseResponseProcessor<T> implements ResponseProcessor<ChannelContext<IOSession, HttpRequest, HttpResponse>, BaseEvent<HttpResponse>> {
 
 
     @Override
-    public void process(ChannelContext requestContext, BaseEvent event, OutputStream os) throws Throwable{
+    public void process(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, OutputStream os) throws Throwable{
         try{
             processHeader(requestContext,event);
             processBody(requestContext, event,(ByteArrayOutputStream)os);
@@ -25,9 +28,9 @@ public abstract class BaseResponseProcessor<T> implements ResponseProcessor<Chan
 
 
 
-    protected abstract void processHeader(ChannelContext requestContext, BaseEvent<T> event) throws Throwable;
+    protected abstract void processHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
 
 
-    protected abstract void processBody(ChannelContext requestContext, BaseEvent<T> event, ByteArrayOutputStream os) throws Throwable;
+    protected abstract void processBody(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable;
 
 }

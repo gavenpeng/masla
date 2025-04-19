@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import static com.msw.masla.common.constant.Constants.MASLA_ROUTE_TAG_HEADER;
+
 /**
  * Author: Gavin.peng
  * Date: 2024/7/28
@@ -53,9 +55,9 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
         String host = null;
         Integer port = 80;
-        String hearderHost = httpRequest.headers().get(HttpHeaderNames.HOST);
-        if (hearderHost != null) {
-            String[] hostPort = hearderHost.split(":");
+        String headerHost = httpRequest.headers().get(HttpHeaderNames.HOST);
+        if (headerHost != null) {
+            String[] hostPort = headerHost.split(":");
             host = hostPort[0];
             if (hostPort.length == 2) {
                 port = Integer.valueOf(hostPort[1]);
@@ -111,6 +113,12 @@ public class RuleApiRouteFilter implements MaslaFilter {
         maslaAsyncContext.setTimeout(routeRule.getTimeout());
         if (StringUtil.isEmptyString(rule.getRewritePath())) {
             maslaAsyncContext.setRewritePath(rule.getRewritePath());
+        }
+
+        //config route tag from http header
+        String routeTag = httpRequest.headers().get(MASLA_ROUTE_TAG_HEADER);
+        if (!StringUtil.isEmptyString(routeTag)) {
+            maslaAsyncContext.setRouteTag(routeTag);
         }
 
         String serviceIdentify = null;

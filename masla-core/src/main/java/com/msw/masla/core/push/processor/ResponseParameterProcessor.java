@@ -17,7 +17,7 @@ public class ResponseParameterProcessor extends AbstractHeaderResponseProcessor 
     private static final String PROCESSOR_NAME = "ResponseParameterProcessor";
 
     @Override
-    protected void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws Throwable {
+    protected void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         try{
             Object result = requestContext.getEvent().getResult();
             if (!(result instanceof FullHttpResponse)) {

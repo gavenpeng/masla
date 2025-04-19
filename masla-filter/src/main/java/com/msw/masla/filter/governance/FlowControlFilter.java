@@ -70,10 +70,10 @@ public class FlowControlFilter extends AbstractMaslaFilter {
 
     private void processNotAcquire(RateLimiter limiter, ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, String serviceId, String appServiceId) {
         if(log.isInfoEnabled()){
-            log.info("Masla flow limit rule rate {} permit is not permit for request {}",limiter.getRate(),requestContext.getRequestUrl());
+            log.info("Masla flow limit rule rate {} permit is not permit for request {}", limiter.getRate(), requestContext.getRequestUrl());
         }
         requestContext.getService().addServiceFlowControllerCount(serviceId);
-        DomainMetrics.addDomainFlowControllerCount(requestContext.getService().getName(),requestContext.getRequestHost(),requestContext.getRequestHost(),"local", 1);
+        DomainMetrics.addDomainFlowControllerCount(requestContext.getService().getName(), requestContext.getRouteHost(), requestContext.getRouteHost(),"local", 1);
         try{
             HttpResponse httpResponse = MaslaBackupResponseUitls.fillBackupResponse(requestContext,appServiceId);
             if(httpResponse != null){

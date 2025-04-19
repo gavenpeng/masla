@@ -1,6 +1,5 @@
 package com.msw.masla.core.async.context;
 
-import com.msw.masla.common.pojo.ParameterRewriteDO;
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.enums.RequestDispatchMode;
 import com.msw.masla.core.router.rule.RouteRule;
@@ -12,19 +11,22 @@ import com.msw.masla.protocol.http.netty.context.ChannelContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.Attribute;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
+import static com.msw.masla.common.constant.Constants.MASLA_REQUEST_TAG_STRESS_HEADER;
+
 /**
- * Created by Gavin.peng on 2024/5/27.
+ * Created by gavin.peng on 2024/5/27.
  */
+
+@Data
 public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest , HttpResponse> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(MaslaAsyncContext.class);
@@ -49,17 +51,23 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
      */
     private String serviceIdentify;
 
-    private String host;
+    /**
+     * routeTag 路由标签
+     */
+    private String routeTag;
 
-    private String dc;//当前机房
+    /**
+     * 路由到的host
+     */
+    private String routeHost;
 
-    private String requestCopyHost;
 
     private ScheduledFuture<?> scheduledFuture;
 
+
     private long timeout;
 
-    private BaseEvent event;
+    private BaseEvent<HttpResponse> event;
 
     private boolean doPush = true;
 
@@ -69,54 +77,32 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
 
     private Map<String, String> cookie;
 
-    private Map<String, ParameterRewriteDO> rewriteRespParamMap;
-
     //当前上下文的请求参数
     private Map<String,List<String>> requstParamsMap;
 
     private int responseContentLength;
 
-    private volatile boolean callbackFilter = false;
-
-
     private ServiceApp serviceApp;
-
-    private boolean isStressRequest;
 
     private HttpResponse httpResponse;
 
     private RouteRule routeRule;
 
-    private final static String SYMBOL_AND = "&";
-
-    public MaslaAsyncContext() {}
-
-    public MaslaAsyncContext(IOSession session, HttpRequest httpRequest, BaseEvent event){
+    public MaslaAsyncContext(IOSession session, HttpRequest httpRequest, BaseEvent<HttpResponse> event){
         this.httpRequest = httpRequest;
         this.event = event;
         this.session = session;
         Attribute<Integer> channelAttributeLine = session.getChannel().attr(MaslaChannelAttribute.REQ_LINE_SIZE);
         if (channelAttributeLine != null && channelAttributeLine.get() != null) {
-            this.requestLineLength = channelAttributeLine.get().intValue();
+            this.requestLineLength = channelAttributeLine.get();
         }
         Attribute<Integer> channelAttributeHeader = session.getChannel().attr(MaslaChannelAttribute.REQ_HEADER_SIZE);
         if (channelAttributeHeader != null && channelAttributeHeader.get() != null) {
-            this.requestHeaderLength = channelAttributeHeader.get().intValue();
+            this.requestHeaderLength = channelAttributeHeader.get();
         }
         this.requestBodyLength = ((FullHttpRequest)httpRequest).content().readableBytes();
     }
 
-
-    public void initGrayContext(BaseEvent event){
-        ((FullHttpRequest) httpRequest).content().resetReaderIndex();
-        this.event = event;
-
-        this.doPush = false;
-        this.requestDispatchMode = RequestDispatchMode.REDIRECT;
-        this.scheduledFuture = null;
-        this.httpResponse = null;
-        this.session = null;
-    }
 
     @Override
     public RequestDispatchMode getRequestDispatchMode() {
@@ -136,7 +122,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
     @Override
     public HttpResponse getHttpResponse() {
         if(event != null && event.getResult() != null){
-            return (HttpResponse)event.getResult();
+            return event.getResult();
         }
         if(httpResponse == null){
             this.httpResponse = NettyCommonUtil.createResponse(HttpResponseStatus.OK,"");
@@ -162,9 +148,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
         this.scheduledFuture = null;
         this.doPush = true;
         this.requestDispatchMode = RequestDispatchMode.DEFAULT;
-        this.host = null;
-        this.dc = null;
-        this.requestCopyHost =null;
+        this.routeTag = null;
         this.requstParamsMap = null;
         this.serviceApp = null;
 
@@ -175,7 +159,6 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
         this.requestHeaderLength = 0;
         this.cookie = null;
         this.headers = null;
-        this.rewriteRespParamMap = null;
         this.timeout = 0;
         this.event = null;
         MaslaRequestContextBuilder.recycleContext(this);
@@ -202,7 +185,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
     }
 
     @Override
-    public void setScheduledFuture(ScheduledFuture scheduledFuture) {
+    public void setScheduledFuture(ScheduledFuture<?> scheduledFuture) {
         this.scheduledFuture = scheduledFuture;
     }
 
@@ -212,7 +195,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
     }
 
     @Override
-    public BaseEvent getEvent() {
+    public BaseEvent<HttpResponse> getEvent() {
         return event;
     }
 
@@ -237,32 +220,41 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
         this.requestPath = requestPath;
     }
 
-    public void reset(IOSession session, HttpRequest httpRequest, BaseEvent event){
+    public void reset(IOSession session, HttpRequest httpRequest, BaseEvent<HttpResponse> event){
         //this.channel = channel;
         this.session = session;
         this.httpRequest = httpRequest;
         this.event = event;
         Attribute<Integer> channelAttributeLine = session.getChannel().attr(MaslaChannelAttribute.REQ_LINE_SIZE);
         if (channelAttributeLine != null && channelAttributeLine.get() != null) {
-            this.requestLineLength = channelAttributeLine.get().intValue();
+            this.requestLineLength = channelAttributeLine.get();
         }
         Attribute<Integer> channelAttributeHeader = session.getChannel().attr(MaslaChannelAttribute.REQ_HEADER_SIZE);
         if (channelAttributeHeader != null && channelAttributeHeader.get() != null) {
-            this.requestHeaderLength = channelAttributeHeader.get().intValue();
+            this.requestHeaderLength = channelAttributeHeader.get();
         }
         this.requestBodyLength = ((FullHttpRequest)httpRequest).content().readableBytes();
-        //this.complete = false;
-//        this.machineType = MachineType.NORMAL;
+    }
+
+
+    @Override
+    public String getRouteTag() {
+        return this.routeTag;
     }
 
     @Override
-    public String getRequestHost() {
-        return this.host;
+    public void setRouteTag(String routeTag) {
+        this.routeTag = routeTag;
     }
 
+
+
+
     @Override
-    public void setRequestfHost(String host) {
-        this.host = host;
+    public boolean isStressRequest() {
+
+        return this.httpRequest.headers().contains(MASLA_REQUEST_TAG_STRESS_HEADER);
+
     }
 
     @Override
@@ -281,7 +273,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
 
     /**
      * 没有发送的情况需要主动release
-     * @param httpRequest
+     * @param httpRequest http request
      */
     private void releaseHttpRequest(HttpRequest httpRequest){
         if(httpRequest != null){
@@ -308,7 +300,7 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
         }
     }
 
-    public void setEvent(BaseEvent event){
+    public void setEvent(BaseEvent<HttpResponse> event){
         this.event = event;
     }
 
@@ -338,11 +330,11 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
             this.requstParamsMap = decoder.parameters();
         }
         if(requstParamsMap != null && !requstParamsMap.isEmpty()){
-            Map<String, String> paramMap = new HashMap<String, String>(
+            Map<String, String> paramMap = new HashMap<>(
                     requstParamsMap.size());
             for (String key : requstParamsMap.keySet()) {
                 List<String> values = requstParamsMap.get(key);
-                if (values != null && values.size() > 0) {
+                if (values != null && !values.isEmpty()) {
                     paramMap.put(key, values.get(0));
                 }
             }
@@ -351,30 +343,19 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
         return null;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
-    public Map<String, String> getCookie() {
-        return cookie;
-    }
+
 
     public void setCookie(Map<String, String> cookie) {
         this.cookie = cookie;
     }
 
-    @Override
-    public void setRequestCopyHost(String copyHost) {
-        this.requestCopyHost = copyHost;
-    }
 
-    public int getResponseContentLength() {
-        return responseContentLength;
-    }
+
 
     public void setResponseContentLength(int responseContentLength) {
         this.responseContentLength = responseContentLength;
@@ -384,19 +365,6 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
     public void fillCookies() {
         Map<String, String> cookies = NettyCommonUtil.getCookieMap(this.httpRequest);
         this.setCookie(cookies);
-    }
-
-    private static String decodeCookie(String cookieValue) {
-        String result = null;
-        try {
-            if (cookieValue != null) {
-                cookieValue = cookieValue.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
-                result = URLDecoder.decode(cookieValue, "UTF-8");
-            }
-        } catch (UnsupportedEncodingException neverHappen) {
-            LOG.error("decode meet UnsupportedEncodingException, value={}", cookieValue);
-        }
-        return result;
     }
 
     @Override
@@ -418,10 +386,6 @@ public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest 
     @Override
     public String getServiceIdentify() {
         return this.serviceIdentify;
-    }
-
-    public RouteRule getRouteRule() {
-        return routeRule;
     }
 
     public void setRouteRule(RouteRule routeRule) {

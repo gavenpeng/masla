@@ -27,7 +27,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     protected HostInstance doSelect(List<HostInstance> hostInstances) {
         if (hostInstances.isEmpty()) {
             if (log.isWarnEnabled()) {
-                log.warn("No servers available for service: ");
+                log.warn("No servers host available for service: ");
             }
             return null;
         }

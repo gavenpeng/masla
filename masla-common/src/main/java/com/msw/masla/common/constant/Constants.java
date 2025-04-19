@@ -117,6 +117,12 @@ public class Constants {
 
 	public static final String MASLA_ROUTE_TAG = "masla.tag";
 
+	public static final String MASLA_ROUTE_TAG_HEADER = "masla_tag";
+
+	public static final String MASLA_REQUEST_TAG_STRESS_HEADER = "stress_tag";
+
+
+
 
 
 
