@@ -117,10 +117,6 @@ public class CircuitFilter extends AbstractMaslaFilter {
 
   /**
    * 检查熔断配置，逻辑如下：
-   *
-   * 1. 如果没有配置API或者APP级别熔断，不进行熔断 2. 如果配置熔断，并且配置熔断参数，但是没有命中请求参数，不进行熔断 3.
-   * 如果配置熔断，没有配置参数熔断，或者参数熔断命中，进行熔断检查
-   *
    * @param context 请求上下文
    * @param apiCircuitDO 熔断配置对象
    * @return true: 允许熔断检查，false：不进行熔断检查

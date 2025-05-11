@@ -304,7 +304,7 @@ public class MaslaAsyncContext implements SessionContext<IOSession ,HttpRequest 
         this.event = event;
     }
 
-    public void setAppDO(ServiceApp serviceApp) {
+    public void setService(ServiceApp serviceApp) {
         this.serviceApp = serviceApp;
     }
 

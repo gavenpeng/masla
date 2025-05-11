@@ -82,7 +82,7 @@ public class MaslaConfConfig {
     @NacosValue("${masla.app.circuit.expired.minute:300}")
     private String appCircuitExpiredMinuteTime;
 
-    @NacosValue("${masla.circuit.upgrade.threshold:}")
+    @NacosValue("${masla.circuit.upgrade.threshold:0.5}")
     private String circuitUpgradeThreshold;
 
     @NacosValue("${masla.circuit.open.min.request.threshold:100}")

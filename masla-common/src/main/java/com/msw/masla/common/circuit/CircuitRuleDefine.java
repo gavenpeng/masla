@@ -32,12 +32,6 @@ public class CircuitRuleDefine {
 
     private int self = 1;
 
-    //熔断比例 -1 关闭，
-    // 10 丢弃10%的请求
-    // 20 丢弃20%的请求
-    // 30 丢弃30%的请求
-    // 50 丢弃50%的请求
-    // 100 全部丢弃
     private Integer circuit;
 
     private Integer status;//0 禁用，1 启用
@@ -52,7 +46,6 @@ public class CircuitRuleDefine {
     //自定义响应参数
     private String customizedResponseParams;
 
-
     /**
      * 自定义响应参数map, 在定时刷新任务中customizedResponseParams
      * 转化为map，避免每次请求都重复转换
@@ -61,6 +54,8 @@ public class CircuitRuleDefine {
 
 
     private Date gmtCreate;
+
+
     private Date gmtModify;
 
     private boolean allDisalbed;

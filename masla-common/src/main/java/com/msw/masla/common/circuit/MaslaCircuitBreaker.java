@@ -53,7 +53,7 @@ public interface MaslaCircuitBreaker {
 
     void upgrade();
 
-    void doUpgradOrDown(Throwable cause, int appType, String appName, int httpStatus);
+    void doUpgradOrDown(Throwable cause, int appType, String appName, int httpStatus, int clusterSize);
 
     boolean supportUpgradOrDown();
 

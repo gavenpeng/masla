@@ -56,6 +56,8 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
 	@Autowired
 	private MaslaNacosServiceManager maslaNacosServiceManager;
 
+	private MaslaNacosServiceDiscovery nacosServiceDiscovery;
+
 
 	public final boolean isOpen() {
 
@@ -73,8 +75,8 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
     @PostConstruct
 	public void init() throws Exception {
 
-		MaslaNacosServiceDiscovery nacosServiceDiscovery = new MaslaNacosServiceDiscovery(this.maslaNacosDiscoveryProperties, this.maslaNacosServiceManager);
-        asyncProxyInvoker = new ClusterProxyAsyncInvoker(this, nacosServiceDiscovery);
+		this.nacosServiceDiscovery = new MaslaNacosServiceDiscovery(this.maslaNacosDiscoveryProperties, this.maslaNacosServiceManager);
+        this.asyncProxyInvoker = new ClusterProxyAsyncInvoker(this, nacosServiceDiscovery);
 
 		MaslaEventLoopGroupFactory eventLoopGroupFactory = MaslaEventLoopGroupFactory.getInstance();
 		NettyConfig nettyConfig = NettyConfig.getInstance();
@@ -156,6 +158,9 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
         PushEngine pushEngine = AsyncPushEngine.getPushEngine(this);
         pushEngine.releaseResource();
     }
+
+
+
 
 
 }

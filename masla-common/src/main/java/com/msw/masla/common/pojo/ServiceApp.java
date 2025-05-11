@@ -419,6 +419,7 @@ public class ServiceApp {
 
 	public void setName(String name) {
 		this.name = name;
+		this.contextRoot = Constants.HTTP_SCHEMA + name;
 	}
 
 	public void setCheckParameters(Integer checkParameters) {

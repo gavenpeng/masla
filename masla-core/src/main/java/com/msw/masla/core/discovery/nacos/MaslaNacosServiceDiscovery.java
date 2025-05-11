@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.pojo.ListView;
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.protocol.http.netty.http.HostInstance;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,16 +21,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description:
  * discovery service in nacos
  */
+@Slf4j
 public class MaslaNacosServiceDiscovery {
 
-    private MaslaNacosDiscoveryProperties maslaNacosDiscoveryProperties;
+    private final MaslaNacosDiscoveryProperties maslaNacosDiscoveryProperties;
 
-    private MaslaNacosServiceManager maslaNacosServiceManager;
+    private final MaslaNacosServiceManager maslaNacosServiceManager;
 
-    private Map<String, List<HostInstance>> stableInstancesMap ;
+    private final Map<String, List<HostInstance>> stableInstancesMap ;
 
     private final Map<String, List<HostInstance>> tagInstancesMap;
-
 
 
     public MaslaNacosServiceDiscovery(MaslaNacosDiscoveryProperties discoveryProperties,
@@ -67,7 +68,6 @@ public class MaslaNacosServiceDiscovery {
         synchronized (this) {
             initInstanceList(instances, serviceId);
         }
-        namingService().subscribe(serviceId, new MaslaNacosEventListener(this));
     }
 
     /**
@@ -107,6 +107,13 @@ public class MaslaNacosServiceDiscovery {
             if (!tagHosts.isEmpty()) {
                 tagInstancesMap.put(serviceId, tagHosts);
             }
+
+            try {
+                namingService().subscribe(serviceId, new MaslaNacosEventListener(this));
+            } catch (Throwable e) {
+                log.error("Masla gateway sub service id {} nacos event failed:", serviceId, e);
+            }
+
         }
 
     }
@@ -169,6 +176,15 @@ public class MaslaNacosServiceDiscovery {
         allInstance.putAll(stableInstancesMap);
         allInstance.putAll(tagInstancesMap);
         return allInstance;
+    }
+
+    public int getServiceHostSize(String serviceName) {
+
+        List<HostInstance> hostInstances = stableInstancesMap.get(serviceName);
+        if (hostInstances != null && !hostInstances.isEmpty()) {
+            return hostInstances.size();
+        }
+        return 0;
     }
 
 }

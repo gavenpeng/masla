@@ -1,7 +1,6 @@
 package com.msw.masla.common.circuit;
 
 import com.msw.masla.common.constant.Constants;
-import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.util.AtomicPositiveInteger;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 
@@ -177,7 +176,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
      * 根据单位时间内服务的错误比例，是否继续熔断还是减少熔断。
      */
     @Override
-    public void doUpgradOrDown(Throwable cause, int appType, String appName, int httpStatus){
+    public void doUpgradOrDown(Throwable cause, int appType, String appName, int httpStatus, int clusterSize){
         if(this.circuitRuleDefine.getCircuit() >= 0 && this.circuitRuleDefine.isAutoMode()) {
 
             //只有超时异常才记录
@@ -197,7 +196,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
                 float errorPercent = Float.valueOf(timeOutNums) / Float.valueOf(requestNums);
 
                 try {
-                    if(this.checkCircuitCondition(requestNums,errorPercent)){
+                    if(this.checkCircuitCondition(requestNums, errorPercent, clusterSize)){
                         upgradeCircuit(timeOutNums,requestNums,errorPercent);
                     } else {
                         float circuitLowWaterMark = MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitUpgradeThreshold();
@@ -234,19 +233,18 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
 
     }
 
-    private boolean checkCircuitCondition(long requestNums,float errorPercent){
+    private boolean checkCircuitCondition(long requestNums,float errorPercent, int clusterSize){
         float circuitHighWaterMark = this.circuitRuleDefine.getCircuitTriggerPercent();
-        int groupHostSize = this.getGroupHostSize(this.circuitRuleDefine.getAppId());
-        if(groupHostSize<=0){
+        if (clusterSize <= 0) {
             return false;
         }
-        long gwInstanceAppQpsThreshold = this.circuitRuleDefine.getCircuitThreshold()/groupHostSize;
-        long seconds = this.circuitRuleDefine.getCircuitTriggerMinute()/1000;
-        if(seconds<=0){
-            seconds=60;
+        long hostQpsThreshold = this.circuitRuleDefine.getCircuitThreshold() / clusterSize;
+        long seconds = this.circuitRuleDefine.getCircuitTriggerMinute() / 1000;
+        if (seconds <= 0) {
+            seconds = 60;
         }
         long runninAppQps = requestNums/seconds;
-        if (runninAppQps > gwInstanceAppQpsThreshold
+        if (runninAppQps > hostQpsThreshold
                 && errorPercent > circuitHighWaterMark) {
             return true;
         }

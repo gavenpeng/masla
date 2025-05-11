@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MaslaNacosEventListener extends AbstractEventListener {
 
-    private MaslaNacosServiceDiscovery maslaNacosServiceDiscovery;
+    private final MaslaNacosServiceDiscovery maslaNacosServiceDiscovery;
 
     public MaslaNacosEventListener(MaslaNacosServiceDiscovery maslaNacosServiceDiscovery) {
         this.maslaNacosServiceDiscovery = maslaNacosServiceDiscovery;

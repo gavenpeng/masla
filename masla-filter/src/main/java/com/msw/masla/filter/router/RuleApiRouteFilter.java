@@ -40,9 +40,7 @@ import static com.msw.masla.common.constant.Constants.MASLA_ROUTE_TAG_HEADER;
 @Slf4j
 public class RuleApiRouteFilter implements MaslaFilter {
 
-    private DefaultRouteRuleFactory defaultRouteRuleFactory;
-
-    private static final long MAX_REQ_LINE_LENGTH = 4096l;
+    private static final long MAX_REQ_LINE_LENGTH = 4096L;
 
     @Override
     public String mappingPath() {
@@ -68,10 +66,6 @@ public class RuleApiRouteFilter implements MaslaFilter {
         String contextRoot = context.getSession().getContextRoot();
         String path = context.getSession().getPath();
         String serviceName = stripLeadingSlash(contextRoot);
-
-        DefaultRouteRuleFactory routeRuleFactory = DefaultRouteRuleFactory.getDefaultRouteRuleFactoryInstance();
-        RouteRuleCache routeRuleCache = routeRuleFactory.getRouteRuleCache();
-        RouteRule routeRule = null;
 
         String requestPath = contextRoot + path;
         //first direct match with path;
@@ -105,11 +99,11 @@ public class RuleApiRouteFilter implements MaslaFilter {
             return;
         }
 
-        ServiceApp appDO = RouteRuleCache.getRouteAppCache(rule.getAppName());
+        ServiceApp routeService = RouteRuleCache.getRouteAppCache(rule.getAppName());
 
         MaslaAsyncContext maslaAsyncContext = (MaslaAsyncContext) context;
         maslaAsyncContext.setRouteRule(rule);
-        maslaAsyncContext.setAppDO(appDO);
+        maslaAsyncContext.setService(routeService);
         maslaAsyncContext.setTimeout(rule.getTimeout());
         if (StringUtil.isEmptyString(rule.getRewritePath())) {
             maslaAsyncContext.setRewritePath(rule.getRewritePath());
@@ -123,9 +117,6 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
         String serviceIdentify = null;
 
-
-
-        //支持url自定义规则
         String reqPath = path.length() > 0 ? path : contextRoot;
         serviceIdentify = ServiceIdFormatUtil.formatServerId(path, context);
         if(ServiceIdFormatUtil.isUNvalidUrl(reqPath)){
@@ -137,7 +128,7 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
         maslaAsyncContext.setServiceIdentify(serviceIdentify);
 
-        if (!checkDecodeResult(context,appDO)){
+        if (!checkDecodeResult(context,routeService)){
             return;
         }
 

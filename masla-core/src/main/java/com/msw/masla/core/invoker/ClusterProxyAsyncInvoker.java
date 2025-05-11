@@ -99,6 +99,9 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
             //selected instance by load balance
             LoadBalance<HostInstance> loadBalance = loadBalanceFactory.getLoadBalance(serviceApp.getLoadBalanceName());
             HostInstance hostInstance = loadBalance.select(instanceList, tagList, maslaContext.getRouteTag());
+            if (hostInstance == null) {
+                throw new NoAvailableHostException("No servers host available for service:" + serviceApp.getName());
+            }
             //get channel pool with selected instance
             MaslaChannelPool channelPool = maslaChannelPoolManager.getChannelPool(hostInstance, serviceApp);
             BaseEvent event = maslaContext.getEvent();
@@ -128,7 +131,6 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
                     appRequestFailedCount.getNoAvailableHostCount().incrementAndGet();
                 }
             }
-
             LOG.error("Masla found request {} no available host",httpRequest.uri());
             localExecFailed(maslaContext,e);
         }catch (Throwable e){
