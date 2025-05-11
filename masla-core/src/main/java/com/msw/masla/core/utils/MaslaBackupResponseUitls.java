@@ -1,6 +1,6 @@
 package com.msw.masla.core.utils;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.*;
 
@@ -15,7 +15,7 @@ public class MaslaBackupResponseUitls {
      * @param serviceId request url path
      * @return http response
      */
-    public static HttpResponse fillBackupResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, String serviceId){
+    public static HttpResponse fillBackupResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, String serviceId){
 
         return null;
     }

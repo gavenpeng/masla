@@ -1,7 +1,7 @@
 package com.msw.masla.filter.frame;
 
 import com.msw.masla.filter.exception.FilterException;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 
 /**
@@ -11,5 +11,5 @@ import com.msw.masla.protocol.http.netty.event.BaseEvent;
  */
 public interface MaslaFilterChain {
 
-    void doFilter(ChannelContext maslaContext, BaseEvent event) throws FilterException;
+    void doFilter(SessionContext maslaContext, BaseEvent event) throws FilterException;
 }

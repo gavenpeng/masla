@@ -11,6 +11,6 @@
 
     <import resource="classpath:applicationContext-core.xml"/>
 
-    <context:property-placeholder location="classpath:masla.properties"/>
+<!--    <context:property-placeholder location="classpath:masla.properties"/>-->
 
 </beans>

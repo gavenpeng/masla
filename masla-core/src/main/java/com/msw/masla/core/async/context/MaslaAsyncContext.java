@@ -7,7 +7,7 @@ import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.protocol.http.netty.codec.MaslaChannelAttribute;
 import com.msw.masla.core.utils.NettyCommonUtil;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.Attribute;
 import io.netty.util.ReferenceCountUtil;
@@ -27,7 +27,7 @@ import static com.msw.masla.common.constant.Constants.MASLA_REQUEST_TAG_STRESS_H
  */
 
 @Data
-public class MaslaAsyncContext implements ChannelContext<IOSession ,HttpRequest , HttpResponse> {
+public class MaslaAsyncContext implements SessionContext<IOSession ,HttpRequest , HttpResponse> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(MaslaAsyncContext.class);
 

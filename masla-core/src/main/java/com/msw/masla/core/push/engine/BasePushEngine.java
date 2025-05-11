@@ -2,7 +2,7 @@ package com.msw.masla.core.push.engine;
 
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.core.async.handle.EventHandler;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Created by Gavin.peng on 2017/6/12.
  */
-public abstract class BasePushEngine implements PushEngine<ChannelContext, BaseEvent<Object>, Object> {
+public abstract class BasePushEngine implements PushEngine<SessionContext, BaseEvent<Object>, Object> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BasePushEngine.class);
 
@@ -51,12 +51,12 @@ public abstract class BasePushEngine implements PushEngine<ChannelContext, BaseE
         //this.initShutdownHook();
     }
 
-    protected void initPushContext(ChannelContext context){
+    protected void initPushContext(SessionContext context){
 
 
     }
 
-    protected void doPush(ChannelContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event){
+    protected void doPush(SessionContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event){
         try {
 
             if(context.needPush()){
@@ -127,7 +127,7 @@ public abstract class BasePushEngine implements PushEngine<ChannelContext, BaseE
         }
     }
 
-    private void logError(ChannelContext context, BaseEvent event) {
+    private void logError(SessionContext context, BaseEvent event) {
         ServiceApp appDO = context.getService();
 
         if (event.getErrorCause() instanceof TimeoutException) {

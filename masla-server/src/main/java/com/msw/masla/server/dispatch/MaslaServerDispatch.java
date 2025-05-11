@@ -1,15 +1,17 @@
 package com.msw.masla.server.dispatch;
 
 
+import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.util.CollectionUtil;
+import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.core.async.context.MaslaRequestContextBuilder;
 import com.msw.masla.core.utils.NettyCommonUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.MaslaDefaultFilterChain;
 import com.msw.masla.filter.frame.MaslaFilter;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.server.AbstractEndpoint;
@@ -60,7 +62,11 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
 
         String requestPath = StringBuilderHolder.getGlobal().append(session.getContextRoot()).append(session.getPath()).toString();
         BaseEvent event = MaslaRequestContextBuilder.buildNettyDispatchEvent();
-        ChannelContext<IOSession, HttpRequest, HttpResponse> reqContext = MaslaRequestContextBuilder.buildMaslaDispatchConext(session, request, event);
+        SessionContext<IOSession, HttpRequest, HttpResponse> reqContext = MaslaRequestContextBuilder.buildMaslaDispatchConext(session, request, event);
+
+
+        MaslaServerConfig maslaServerConfig = (MaslaServerConfig) MaslaSpringContextUtil.getBean("maslaServerConfig");
+        LOG.info("Server config port:{}", maslaServerConfig.getPort());
 
         //the app's health check
         if (session.getContextRoot().equals(Constants.MASLA_HEALTHCHECK_PATH_END)

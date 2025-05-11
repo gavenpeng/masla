@@ -6,7 +6,7 @@ import com.msw.masla.core.router.rule.RouteRuleCache;
 import com.msw.masla.core.utils.NettyCommonUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
@@ -29,7 +29,7 @@ public class GlobalBlackListFilter extends AbstractMaslaFilter {
 
 
     @Override
-    public boolean apply(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws FilterException {
+    public boolean apply(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws FilterException {
 
         boolean forbidden = false;
         try {
@@ -61,7 +61,7 @@ public class GlobalBlackListFilter extends AbstractMaslaFilter {
     }
 
 
-    private void returnForbiddenResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext) {
+    private void returnForbiddenResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
 
         try {
             String appServiceId = NettyCommonUtil.getServiceId(requestContext);

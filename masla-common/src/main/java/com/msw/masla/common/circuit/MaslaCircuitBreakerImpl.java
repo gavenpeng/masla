@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Created by Gavin.peng on 2018/1/15.
+ * Created by Gavin.peng on 2023/08/15.
  */
 public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
 

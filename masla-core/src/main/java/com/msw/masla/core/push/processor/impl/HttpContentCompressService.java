@@ -1,6 +1,6 @@
 package com.msw.masla.core.push.processor.impl;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.core.utils.HttpContentCompressUtils;
 import com.msw.masla.protocol.http.netty.compress.ZlibCodecFactory;
@@ -60,7 +60,7 @@ public class HttpContentCompressService {
     }
 
 
-    public FullHttpResponse compressContent(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, FullHttpResponse httpResponse) throws Throwable {
+    public FullHttpResponse compressContent(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, FullHttpResponse httpResponse) throws Throwable {
 
         ByteBuf content = httpResponse.content();
         long contentSize = content.readableBytes();

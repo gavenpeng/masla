@@ -1,5 +1,5 @@
 package com.msw.masla.core.push.processor;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -14,11 +14,11 @@ public abstract class AbstractBodyResponseProcessor extends BaseResponseProcesso
 
 
     @Override
-    protected void processHeader(ChannelContext requestContext, BaseEvent event) throws Throwable {
+    protected void processHeader(SessionContext requestContext, BaseEvent event) throws Throwable {
     }
 
     @Override
-    protected void processBody(ChannelContext requestContext, BaseEvent event, ByteArrayOutputStream os) throws Throwable {
+    protected void processBody(SessionContext requestContext, BaseEvent event, ByteArrayOutputStream os) throws Throwable {
         Object response  = event.getResult();
         if(response instanceof HttpResponse){
             this.processHttpBody(requestContext,event,os);
@@ -31,8 +31,8 @@ public abstract class AbstractBodyResponseProcessor extends BaseResponseProcesso
         }
     }
 
-    abstract protected void processNettyBody(ChannelContext requestContext, BaseEvent event, ByteBuf content) throws Throwable;
+    abstract protected void processNettyBody(SessionContext requestContext, BaseEvent event, ByteBuf content) throws Throwable;
 
-    abstract protected void processHttpBody(ChannelContext requestContext, BaseEvent event, ByteArrayOutputStream os) throws Throwable;
+    abstract protected void processHttpBody(SessionContext requestContext, BaseEvent event, ByteArrayOutputStream os) throws Throwable;
 
 }

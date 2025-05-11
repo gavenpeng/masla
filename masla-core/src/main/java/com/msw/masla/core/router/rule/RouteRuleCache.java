@@ -15,6 +15,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import static com.msw.masla.common.constant.Constants.HTTP_SCHEMA;
+
 /**
  * Author: Gavin.peng
  * Date: 2024/8/3
@@ -132,7 +134,7 @@ public class RouteRuleCache  {
     private void addRouteRuleCommonPattern(RouteRule routeRule, Pattern pattern){
         TreeMap<Pattern, RouteRule> patternApiDOMap = APP_PATTERN_ROUTE_RULE_CACHE.get(routeRule.getAppName());
         if (patternApiDOMap == null) {
-            patternApiDOMap = new TreeMap<Pattern, RouteRule>(routeRuleComparator);
+            patternApiDOMap = new TreeMap<>(routeRuleComparator);
             APP_PATTERN_ROUTE_RULE_CACHE.put(routeRule.getAppName(), patternApiDOMap);
             patternApiDOMap.entrySet();
         }

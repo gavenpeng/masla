@@ -3,7 +3,7 @@ package com.msw.masla.core;
 
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.common.util.StringUtil;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 
 import java.util.regex.Matcher;
 
@@ -51,7 +51,7 @@ public class ServiceIdFormatUtil {
     }
 
 
-    public static String formatServerId(String url, ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext){
+    public static String formatServerId(String url, SessionContext<IOSession, HttpRequest, HttpResponse> requestContext){
 
         String realTarget = requestContext ==null?null:requestContext.getRewritePath();
 

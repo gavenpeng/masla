@@ -3,7 +3,7 @@ package com.msw.masla.core.push.engine;
 
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.core.async.pool.PushTask;
@@ -45,7 +45,7 @@ public class AsyncPushEngine extends BasePushEngine {
     }
 
     @Override
-    public void push(final ChannelContext context, final BaseEvent event) {
+    public void push(final SessionContext context, final BaseEvent event) {
 
         try {
             event.setState(EventState.PUSH_INIT);
@@ -77,7 +77,7 @@ public class AsyncPushEngine extends BasePushEngine {
 
     protected class MaslaPusher extends PushTask {
 
-        public MaslaPusher(ChannelContext context, BaseEvent event) {
+        public MaslaPusher(SessionContext context, BaseEvent event) {
             super(context, event);
         }
 

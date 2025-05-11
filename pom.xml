@@ -18,7 +18,7 @@
     <junit.version>4.11</junit.version>
     <metrics.version>3.1.0</metrics.version>
     <mockito.version>1.9.5</mockito.version>
-    <spring.version>4.3.3.RELEASE</spring.version>
+    <spring.version>5.2.15.RELEASE</spring.version>
     <slf4j.version>1.7.5</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <commons.model.version>0.0.2</commons.model.version>
@@ -349,6 +349,7 @@
         <groupId>com.msw.masla</groupId>
         <artifactId>masla-common</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <scope>compile</scope>
       </dependency>
 
       <dependency>
@@ -361,6 +362,7 @@
         <groupId>com.msw.masla</groupId>
         <artifactId>masla-remote-http</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <scope>compile</scope>
       </dependency>
 
       <dependency>

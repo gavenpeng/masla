@@ -11,7 +11,7 @@ import com.msw.masla.core.utils.NettyCommonUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
 import com.msw.masla.metrics.http.DomainMetrics;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
@@ -33,7 +33,7 @@ public class FlowControlFilter extends AbstractMaslaFilter {
 
 
     @Override
-    public boolean apply(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws FilterException {
+    public boolean apply(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws FilterException {
         String serviceId = requestContext.getServiceIdentify();
         String appServiceId = requestContext.getSession().getContextRoot() + serviceId;
 
@@ -68,7 +68,7 @@ public class FlowControlFilter extends AbstractMaslaFilter {
         return true;
     }
 
-    private void processNotAcquire(RateLimiter limiter, ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, String serviceId, String appServiceId) {
+    private void processNotAcquire(RateLimiter limiter, SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, String serviceId, String appServiceId) {
         if(log.isInfoEnabled()){
             log.info("Masla flow limit rule rate {} permit is not permit for request {}", limiter.getRate(), requestContext.getRequestUrl());
         }

@@ -1,6 +1,6 @@
 package com.msw.masla.core.push.processor;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -17,7 +17,7 @@ public class ResponseParameterProcessor extends AbstractHeaderResponseProcessor 
     private static final String PROCESSOR_NAME = "ResponseParameterProcessor";
 
     @Override
-    protected void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
+    protected void processResponseHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         try{
             Object result = requestContext.getEvent().getResult();
             if (!(result instanceof FullHttpResponse)) {

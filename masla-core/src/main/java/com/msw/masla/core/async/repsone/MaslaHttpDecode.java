@@ -4,7 +4,7 @@ import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.monitor.metrics.BandwidthCount;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.protocol.http.netty.event.IEvent;
@@ -67,7 +67,7 @@ public class MaslaHttpDecode implements MaslaDecode {
 
 
     public void decodeResponse(final Channel channel,FullHttpResponse fullHttpResponse) {
-        final ChannelContext<IOSession, HttpRequest, HttpResponse> curContext = channel.attr(ChannelContext.CONTEXT_KEY).getAndSet(null);
+        final SessionContext<IOSession, HttpRequest, HttpResponse> curContext = channel.attr(SessionContext.CONTEXT_KEY).getAndSet(null);
         if(curContext == null){
             ReferenceCountUtil.release(fullHttpResponse);
             return;
@@ -132,7 +132,7 @@ public class MaslaHttpDecode implements MaslaDecode {
 
     }
 
-    private void releaseAndPush(final ChannelContext maslaContext, final IEvent event, final Channel channel){
+    private void releaseAndPush(final SessionContext maslaContext, final IEvent event, final Channel channel){
 
         releaseChannel(channel);
 
@@ -168,7 +168,7 @@ public class MaslaHttpDecode implements MaslaDecode {
 
     @Override
     public void receiveException(final Channel channel,final Throwable e) {
-        final ChannelContext<IOSession, HttpRequest, HttpResponse> curContext = channel.attr(ChannelContext.CONTEXT_KEY).getAndSet(null);
+        final SessionContext<IOSession, HttpRequest, HttpResponse> curContext = channel.attr(SessionContext.CONTEXT_KEY).getAndSet(null);
         //添加了timeout task后，防止重复push
         if(curContext != null) {
             //final BaseEvent event = channel.attr(BaseEvent.EVENT_KEY).getAndSet(null);
@@ -211,7 +211,7 @@ public class MaslaHttpDecode implements MaslaDecode {
 
     }
 
-    private void closeAndPush(final ChannelContext maslaContext, final BaseEvent event, final Channel channel){
+    private void closeAndPush(final SessionContext maslaContext, final BaseEvent event, final Channel channel){
 
         if (channel != null) {
             if(!channel.closeFuture().isDone()) {
@@ -233,7 +233,7 @@ public class MaslaHttpDecode implements MaslaDecode {
     @Override
     public void idleTimeout(final Channel channel) {
 
-        final ChannelContext curContext = channel.attr(ChannelContext.CONTEXT_KEY).getAndSet(null);
+        final SessionContext curContext = channel.attr(SessionContext.CONTEXT_KEY).getAndSet(null);
         if(curContext !=null) {
             final BaseEvent event = curContext.getEvent();
             //没有发送完成，有可能只发一部分，还是可以重试，所以这里只关闭连接,让发送future 重试
@@ -285,7 +285,7 @@ public class MaslaHttpDecode implements MaslaDecode {
     @Override
     public void readTimeout(final Channel channel) {
 
-        final ChannelContext bindContext = channel.attr(ChannelContext.CONTEXT_KEY).getAndSet(null);
+        final SessionContext bindContext = channel.attr(SessionContext.CONTEXT_KEY).getAndSet(null);
         //bindContext 为空，说明1 请求要么响应，2出现异常，比如服务端关闭了连接，
         if(bindContext != null) {
             final BaseEvent event = bindContext.getEvent();
@@ -313,7 +313,7 @@ public class MaslaHttpDecode implements MaslaDecode {
 
     }
 
-    private long showCostTime(Channel channel, ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event){
+    private long showCostTime(Channel channel, SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event){
         long acquireTime = event.getStartSendTime() - event.getStartAcquireConnTime();
         long now = System.nanoTime();
 

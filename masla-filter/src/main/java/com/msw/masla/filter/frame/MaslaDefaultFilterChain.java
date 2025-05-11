@@ -1,7 +1,7 @@
 package com.msw.masla.filter.frame;
 
 import com.msw.masla.filter.exception.FilterException;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.filter.servlet.MaslaServlet;
 
@@ -48,7 +48,7 @@ public class MaslaDefaultFilterChain implements MaslaFilterChain {
 
 
     @Override
-    public void doFilter(ChannelContext requestContext, BaseEvent event) throws FilterException {
+    public void doFilter(SessionContext requestContext, BaseEvent event) throws FilterException {
         //filter chain 执行完以后，执行servlet，如果其中一个filter执行失败，不影响当前请求,继续执行下一个
         if (pos < filterCnt) {
             MaslaFilter filter = filters[pos++];
@@ -63,7 +63,7 @@ public class MaslaDefaultFilterChain implements MaslaFilterChain {
         }
     }
 
-    private void doService(ChannelContext requestContext, BaseEvent event) throws FilterException{
+    private void doService(SessionContext requestContext, BaseEvent event) throws FilterException{
         try {
             servlet.service(requestContext, event);
         }catch (IOException e){

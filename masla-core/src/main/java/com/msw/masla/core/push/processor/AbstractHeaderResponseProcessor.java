@@ -1,6 +1,6 @@
 package com.msw.masla.core.push.processor;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
@@ -19,16 +19,16 @@ public abstract class AbstractHeaderResponseProcessor extends BaseResponseProces
 
 
     @Override
-    protected void processHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
+    protected void processHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         this.processResponseHeader(requestContext,event);
     }
 
     @Override
-    protected void processBody(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable {
+    protected void processBody(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable {
 
     }
 
 
-    protected abstract void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
+    protected abstract void processResponseHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
 
 }

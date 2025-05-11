@@ -4,7 +4,7 @@ import com.msw.masla.common.circuit.CircuitFactory;
 import com.msw.masla.common.circuit.MaslaCircuitBreaker;
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.util.StringBuilderHolder;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -19,7 +19,7 @@ public class CircuitBreakNettyResponseProcessor extends MaslaBodyResponseProcess
 
 
     @Override
-    public void processNettyResponseBody(ChannelContext requestContext, BaseEvent<FullHttpResponse> event, ByteBuf content) throws Throwable {
+    public void processNettyResponseBody(SessionContext requestContext, BaseEvent<FullHttpResponse> event, ByteBuf content) throws Throwable {
 
         circuitBreaker(requestContext,event.getResult(),event.getErrorCause());
 
@@ -33,7 +33,7 @@ public class CircuitBreakNettyResponseProcessor extends MaslaBodyResponseProcess
 
 
 
-    private void circuitBreaker(ChannelContext requestContext, FullHttpResponse httpResponse, Throwable cause){
+    private void circuitBreaker(SessionContext requestContext, FullHttpResponse httpResponse, Throwable cause){
 
         //ServiceApi execApi = requestContext.getExecApi();
         ServiceApp appDO = requestContext.getService();

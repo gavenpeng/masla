@@ -10,7 +10,7 @@ import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.core.push.processor.AbstractHeaderResponseProcessor;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.metrics.http.DomainMetrics;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
@@ -35,7 +35,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
 
 
     @Override
-    public void processResponseHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
+    public void processResponseHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable {
         try{
             long now = TimeUnit.NANOSECONDS.toMillis(System.nanoTime());
 
@@ -161,7 +161,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
      * @param requestContext async  request context
      * @param appDO request service
      */
-    private void staticsDomainBandwidth(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
+    private void staticsDomainBandwidth(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
         try {
 
             int totalBandWidthSize = 0;

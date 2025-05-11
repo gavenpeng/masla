@@ -2,7 +2,7 @@ package com.msw.masla.core.async.handle;
 
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.util.StringUtil;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.core.push.processor.impl.CircuitBreakNettyResponseProcessor;
@@ -52,7 +52,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
 
 
     @Override
-    protected void doHandle(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) throws Throwable {
+    protected void doHandle(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) throws Throwable {
         prevPush(requestContext, event);
         try{
             if(LOG.isDebugEnabled()) {
@@ -79,7 +79,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
     }
 
 
-    private void push(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event)throws Throwable{
+    private void push(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event)throws Throwable{
         try {
 
             //如果是网关发起的varnish请求，需要修改下请求类型，保证原始请求的context释放
@@ -118,7 +118,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
      * @param event
      * @throws Throwable
      */
-    private void prevPush(ChannelContext requestContext, BaseEvent<FullHttpResponse> event) throws Throwable{
+    private void prevPush(SessionContext requestContext, BaseEvent<FullHttpResponse> event) throws Throwable{
 
         if (prevProcessesList != null && prevProcessesList.size() > 0) {
             for (ResponseProcessor processor : prevProcessesList) {
@@ -138,7 +138,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
      * @param event
      * @throws Throwable
      */
-    private void postPush(final ChannelContext requestContext, final BaseEvent<FullHttpResponse> event) throws Throwable{
+    private void postPush(final SessionContext requestContext, final BaseEvent<FullHttpResponse> event) throws Throwable{
         if (postProcessesList != null && postProcessesList.size() > 0) {
             for (ResponseProcessor processor : postProcessesList) {
                 try {
@@ -168,7 +168,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
     }
 
 
-    private void pushNoResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) throws Throwable{
+    private void pushNoResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) throws Throwable{
         if(LOG.isInfoEnabled()) {
             LOG.info("intranet request no response, request url {},error msg {}",
                     requestContext.getHttpRequest().uri(), event.getErrorCause());
@@ -233,14 +233,14 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
     }
 
 
-    private void pushResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, FullHttpResponse httpResponse) throws Throwable {
+    private void pushResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, FullHttpResponse httpResponse) throws Throwable {
         //服务正常响应的情况下，也支持自定义响应
         httpResponse.retain();
         requestContext.getSession().writeAndFlush(httpResponse);
     }
 
     @Override
-    protected void initHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) {
+    protected void initHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<FullHttpResponse> event) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Masla start init response header for push request {} status {}", requestContext.getRequestUrl(), event.getState());
         }

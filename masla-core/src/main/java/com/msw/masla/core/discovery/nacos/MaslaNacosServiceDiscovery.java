@@ -52,7 +52,7 @@ public class MaslaNacosServiceDiscovery {
 
             initAllInstances(serviceId);
         }
-        return tag ? stableInstancesMap.get(serviceId) : tagInstancesMap.get(serviceId);
+        return !tag ? stableInstancesMap.get(serviceId) : tagInstancesMap.get(serviceId);
 
     }
 
@@ -89,6 +89,9 @@ public class MaslaNacosServiceDiscovery {
             return;
         }
         synchronized (this) {
+            if (stableInstancesMap.containsKey(serviceId)) {
+                return;
+            }
             List<HostInstance> result = new ArrayList<>(instances.size());
             List<HostInstance> tagHosts = new ArrayList<>(instances.size());
             for (Instance instance : instances) {
@@ -101,7 +104,9 @@ public class MaslaNacosServiceDiscovery {
                 }
             }
             stableInstancesMap.put(serviceId, result);
-            tagInstancesMap.put(serviceId, tagHosts);
+            if (!tagHosts.isEmpty()) {
+                tagInstancesMap.put(serviceId, tagHosts);
+            }
         }
 
     }

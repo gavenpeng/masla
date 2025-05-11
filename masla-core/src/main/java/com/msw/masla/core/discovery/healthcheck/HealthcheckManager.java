@@ -1,7 +1,6 @@
 package com.msw.masla.core.discovery.healthcheck;
 
 import com.msw.masla.common.constant.Constants;
-import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.enums.HostStatus;
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.util.AtomicPositiveInteger;
@@ -70,11 +69,14 @@ public class HealthcheckManager {
         }
     }
 
+    public void registerMaslaNacosServiceDiscovery(MaslaNacosServiceDiscovery maslaNacosServiceDiscovery) {
+        this.maslaNacosServiceDiscovery = maslaNacosServiceDiscovery;
+    }
 
     private boolean isHealthCheckDisabled(){
         boolean disabled = false;
         try {
-            Properties properties = PropertiesLoaderUtils.loadAllProperties("Masla-web.properties");
+            Properties properties = PropertiesLoaderUtils.loadAllProperties("masla.properties");
             String config = properties.getProperty("Masla.health.check.disable", "false");
             disabled = Boolean.parseBoolean(config);
         } catch (IOException e) {
@@ -198,7 +200,7 @@ public class HealthcheckManager {
 
 
             }catch (Throwable e){
-                LOG.error("Masla do health check task failed:{}",e.getMessage());
+                LOG.error("Masla do health check task failed:{}", e.getMessage());
             }
         }
 

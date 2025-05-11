@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
 
-    public static final String NAME = "roundrobin";
+    public static final String NAME = "RR";
 
     private final AtomicInteger position;
 

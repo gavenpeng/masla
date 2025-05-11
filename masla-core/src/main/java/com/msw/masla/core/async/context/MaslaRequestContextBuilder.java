@@ -4,7 +4,7 @@ import com.msw.masla.common.constant.Constants;
 import com.msw.masla.core.async.event.AsyncNettyEvent;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.pool.SynchronizedStack;
 import io.netty.handler.codec.http.HttpRequest;
 
@@ -36,8 +36,8 @@ public class MaslaRequestContextBuilder {
 
 
 
-    public static ChannelContext buildMaslaDispatchConext(IOSession session, HttpRequest httpRequest, BaseEvent event){
-        ChannelContext maslaContext = contextCache.pop();
+    public static SessionContext buildMaslaDispatchConext(IOSession session, HttpRequest httpRequest, BaseEvent event){
+        SessionContext maslaContext = contextCache.pop();
         if(maslaContext == null) {
             maslaContext = new MaslaAsyncContext(session, httpRequest, event);
         }else {
@@ -57,7 +57,7 @@ public class MaslaRequestContextBuilder {
         return event;
     }
 
-    public static void recycleContext(ChannelContext maslaContext){
+    public static void recycleContext(SessionContext maslaContext){
         contextCache.push((MaslaAsyncContext) maslaContext);
     }
 

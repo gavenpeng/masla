@@ -10,7 +10,7 @@ import com.msw.masla.core.utils.MaslaBackupResponseUitls;
 import com.msw.masla.core.utils.NettyCommonUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 
@@ -43,7 +43,7 @@ public class CircuitFilter extends AbstractMaslaFilter {
 
 
   @Override
-  public boolean apply(ChannelContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event) throws FilterException {
+  public boolean apply(SessionContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event) throws FilterException {
 
     try {
       ServiceApp appDO = context.getService();
@@ -84,7 +84,7 @@ public class CircuitFilter extends AbstractMaslaFilter {
    * @param serviceId
    * @param apiCircuitDO
    */
-  private void doClosure(ChannelContext<IOSession, HttpRequest, HttpResponse> context, String serviceId, CircuitRuleDefine apiCircuitDO) {
+  private void doClosure(SessionContext<IOSession, HttpRequest, HttpResponse> context, String serviceId, CircuitRuleDefine apiCircuitDO) {
 
     //标记开始熔断的时间
     if (apiCircuitDO != null && apiCircuitDO.getCircuitTime().get() == -1) {
@@ -125,7 +125,7 @@ public class CircuitFilter extends AbstractMaslaFilter {
    * @param apiCircuitDO 熔断配置对象
    * @return true: 允许熔断检查，false：不进行熔断检查
    */
-  private boolean allowCheckCircuit(ChannelContext<IOSession, HttpRequest, HttpResponse> context, CircuitRuleDefine apiCircuitDO) {
+  private boolean allowCheckCircuit(SessionContext<IOSession, HttpRequest, HttpResponse> context, CircuitRuleDefine apiCircuitDO) {
 
     //没有熔断配置，不进行检测
     if (apiCircuitDO == null) {
@@ -152,7 +152,7 @@ public class CircuitFilter extends AbstractMaslaFilter {
    * @param apiCircuitDO 熔断配置对象
    * @return true: 命中，false：没有命中
    */
-  private boolean contains(ChannelContext<IOSession, HttpRequest, HttpResponse> context,
+  private boolean contains(SessionContext<IOSession, HttpRequest, HttpResponse> context,
                            CircuitRuleDefine apiCircuitDO) {
 
     //如果cookie没有解析，则临时解析

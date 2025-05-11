@@ -1,7 +1,7 @@
 package com.msw.masla.core.push.engine;
 
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.core.async.handle.factory.HandlerFactory;
 import com.msw.masla.core.async.handle.factory.MaslaHandlerFactory;
@@ -40,7 +40,7 @@ public class SyncPushEngine extends BasePushEngine {
     }
 
     @Override
-    public void push(ChannelContext context, BaseEvent event) {
+    public void push(SessionContext context, BaseEvent event) {
         doPush(context,event);
     }
 

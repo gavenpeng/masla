@@ -3,7 +3,7 @@ package com.msw.masla.filter.servlet;
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
 import com.msw.masla.core.invoker.ProxyInvoker;
 import com.msw.masla.core.utils.NettyCommonUtil;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+import static com.msw.masla.common.constant.Constants.MASLA_COMMON_MATCH_PATH;
+
 @Slf4j
 public class MaslaDefaultServlet implements MaslaServlet {
 
@@ -20,7 +22,7 @@ public class MaslaDefaultServlet implements MaslaServlet {
 
     @Override
     public String mappingPath() {
-        return "/*";
+        return MASLA_COMMON_MATCH_PATH;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class MaslaDefaultServlet implements MaslaServlet {
     }
 
     @Override
-    public void service(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws IOException {
+    public void service(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event) throws IOException {
 
         ProxyInvoker proxyInvoker = this.proxyInvokerFactory.getAsyncProxyInvoker();
         try {

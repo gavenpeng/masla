@@ -1,7 +1,7 @@
 package com.msw.masla.filter.governance;
 
 import com.msw.masla.core.router.rule.FlowSelectorRule;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class FlowRuleMatchUtils {
 
-    public static boolean flowMatchSelectorRule(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext,
+    public static boolean flowMatchSelectorRule(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext,
                                          FlowSelectorRule flowSelectorRule) {
 
         if (!StringUtils.isEmpty(flowSelectorRule.getPath())) {

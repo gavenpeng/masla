@@ -64,7 +64,7 @@ public class MaslaServerChannelHandler extends AbstractServerChannelHandler {
         this.priorityQueue = endpoint.getPriorityQueue();
         this.backupHandlers = new Handler[endpoint.getBackupHandlers()];
         this.priorityHandlers = new Handler[endpoint.getPriorityHandlers()];
-        this.executor = executor;
+        this.executor = endpoint.getExecutor();
         //启动backup 线程组
         for(int i=0; i < endpoint.getBackupHandlers(); i++){
             backupHandlers[i] = new Handler(this.backQueue);

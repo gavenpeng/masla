@@ -33,7 +33,10 @@ public class ServiceApp {
 	private static final int SERVICE_ID_LIMIT = 10000;
 
 	private Long id;
+
 	private String name;
+
+
 	private String contextRoot;
 	/**
 	 * 关联流控规则ID
@@ -45,7 +48,9 @@ public class ServiceApp {
 	 */
 	private String blackSelectorIds;
 
+
 	private Integer status;
+
 
 	private String addUser;
 
@@ -68,8 +73,6 @@ public class ServiceApp {
 	//app 绑定的LoopGroup 类型，默认为default,有0 default,1 fast,2 slow
 	private int poolGroupType = 0;
 
-	private String dockerId;
-
 	//获取app 熔断时的响应内容的地址，只需要servlet/controller
 	private String discardPath;
 
@@ -79,9 +82,6 @@ public class ServiceApp {
 	private String backupDiscardResponse;
 
 	private String groupName;
-
-	//应用的主机房
-	private String dataCenter = "default";
 
 	private Integer discard = -1;
 
@@ -189,27 +189,17 @@ public class ServiceApp {
 	private  AtomicLong clientConnClosedCount = new AtomicLong(0);
 
 
-	public ConcurrentHashMap<String, BandwidthCount> getAppBandwidthMap() {
-		return appBandwidthMap;
-	}
-
 	public void setAppBandwidthMap(
 			ConcurrentHashMap<String, BandwidthCount> appBandwidthMap) {
 		this.appBandwidthMap = appBandwidthMap;
 	}
 
-	public BodySectionCount getRequestBodyCount() {
-		return requestBodyCount;
-	}
 
 	public void setRequestBodyCount(
 			BodySectionCount requestBodyCount) {
 		this.requestBodyCount = requestBodyCount;
 	}
 
-	public BodySectionCount getResponseBodyCount() {
-		return responseBodyCount;
-	}
 
 	public void setResponseBodyCount(
 			BodySectionCount responseBodyCount) {
@@ -238,60 +228,18 @@ public class ServiceApp {
 
 	public void initDefaultCircuit(){
 		if(this.defaultCircuit == null) {
-			this.defaultCircuit = new CircuitRuleDefine(0.5f, this.name,this.id);
+			this.defaultCircuit = new CircuitRuleDefine(0.5f, this.name);
 		}
 	}
-	public String getContextRoot() {
-		return contextRoot;
-	}
-
-
 
 	public void setContextRoot(String contextRoot) {
 		this.contextRoot = contextRoot;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-
-		this.id = id;
-	}
-
-
-	public String getFlowRuleIds() {
-		return flowRuleIds;
 	}
 
 	public void setFlowRuleIds(String flowRuleIds) {
 		this.flowRuleIds = flowRuleIds;
 	}
 
-	/**
-	 * @return the status
-	 */
-	public Integer getStatus() {
-
-		return status;
-	}
-
-	/**
-	 * @param status
-	 *            the status to set
-	 */
-	public void setStatus(Integer status) {
-
-		this.status = status;
-	}
 
 	/**
 	 * @param addUser
@@ -302,38 +250,11 @@ public class ServiceApp {
 		this.addUser = addUser;
 	}
 
-	public long getQps() {
-		return qps;
-	}
 
 	public void setQps(long qps) {
 		this.qps = qps;
 	}
 
-	/**
-	 * @return the gmtCreate
-	 */
-	public Date getGmtCreate() {
-
-		return gmtCreate;
-	}
-
-	/**
-	 * @param gmtCreate
-	 *            the gmtCreate to set
-	 */
-	public void setGmtCreate(Date gmtCreate) {
-
-		this.gmtCreate = gmtCreate;
-	}
-
-	/**
-	 * @return the gmtModify
-	 */
-	public Date getGmtModify() {
-
-		return gmtModify;
-	}
 
 	/**
 	 * @param gmtModify
@@ -346,40 +267,28 @@ public class ServiceApp {
 
 
 
-	public AtomicLong getAllCostTimeSum() {
-		return allCostTimeSum;
-	}
 
 	public void setAllCostTimeSum(AtomicLong allCostTimeSum) {
 		this.allCostTimeSum = allCostTimeSum;
 	}
 
-	public AtomicLong getServerCostTimeSum() {
-		return serverCostTimeSum;
-	}
 
 	public void setServerCostTimeSum(AtomicLong serverCostTimeSum) {
 		this.serverCostTimeSum = serverCostTimeSum;
 	}
 
-	public AtomicLong getAcquireConnectCostTimeSum() {
-		return acquireConnectCostTimeSum;
-	}
 
 	public void setAcquireConnectCostTimeSum(AtomicLong acquireConnectCostTimeSum) {
 		this.acquireConnectCostTimeSum = acquireConnectCostTimeSum;
 	}
 
-	public AtomicLong getQueueWaitCostTimeSum() {
-		return queueWaitCostTimeSum;
-	}
 
 	public void setQueueWaitCostTimeSum(AtomicLong queueWaitCostTimeSum) {
 		this.queueWaitCostTimeSum = queueWaitCostTimeSum;
 	}
 
 	public boolean isCircuit(){
-		return this.serviceIdCircuitMetricMap.isEmpty()?false:true;
+		return !this.serviceIdCircuitMetricMap.isEmpty();
 	}
 
 	public ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>> getAppHostServiceIdTP90Map() {
@@ -410,22 +319,6 @@ public class ServiceApp {
 		histogram.recordValue(costTime);
 
 	}
-
-
-	public CircuitRuleDefine getDefaultCircuit(){
-
-		return this.defaultCircuit;
-	}
-
-	public void incrementQueryCount() {
-
-//		if(!this.supportServiceId){
-//			this.queryCount.increment();
-//			this.appHostServiceIdMetricMap.clear();
-//			this.appHostServiceIdTP90Map.clear();
-//		}
-	}
-
 
 	public void addServiceCircuitCount(String serviceId){
 		LongAdder longAdder = this.serviceIdCircuitMetricMap.get(serviceId);
@@ -519,92 +412,48 @@ public class ServiceApp {
 	}
 
 
-	public LongAdder getQueryCount() {
-		return queryCount;
-	}
-
 	public void addQPS(long qps){
 		this.qps += qps;
 	}
 
 
-
-	public String getName() {
-		return name;
-	}
-
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Integer getCheckParameters() {
-		return checkParameters;
 	}
 
 	public void setCheckParameters(Integer checkParameters) {
 		this.checkParameters = checkParameters;
 	}
 
-	public String getSecurityKey() {
-		return securityKey;
-	}
-
 	public void setSecurityKey(String securityKey) {
 		this.securityKey = securityKey;
 	}
 
-	public String getSignatureParameterName() {
-		return signatureParameterName;
-	}
 
 	public void setSignatureParameterName(String signatureParameterName) {
 		this.signatureParameterName = signatureParameterName;
 	}
 
-	public int getPoolGroupType() {
-		return poolGroupType;
-	}
 
 	public void setPoolGroupType(int poolGroupType) {
 		this.poolGroupType = poolGroupType;
 	}
 
-	public String getDockerId() {
-		return dockerId;
-	}
-
-	public void setDockerId(String dockerId) {
-		this.dockerId = dockerId;
-	}
-
-
-	public String getGroupName() {
-		return groupName;
-	}
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
 
-	public String getLoadBalanceName() {
-		return loadBalanceName;
-	}
 
 	public void setLoadBalanceName(String loadBalanceName) {
 		this.loadBalanceName = loadBalanceName;
 	}
 
-	public Integer getDiscard() {
-		return discard;
-	}
 
 	public void setDiscard(Integer discard) {
 		this.discard = discard;
 	}
 
-	public String getDiscardPath() {
-		return discardPath;
-	}
 
 	public void setDiscardPath(String discardPath) {
 		this.discardPath = discardPath;
@@ -615,29 +464,15 @@ public class ServiceApp {
 		this.serviceIdCount = serviceIdCount;
 	}
 
-
-	public String getBlackSelectorIds() {
-		return blackSelectorIds;
-	}
-
 	public void setBlackSelectorIds(String blackSelectorIds) {
 		this.blackSelectorIds = blackSelectorIds;
 	}
 
-	public Integer getType() { return type; }
 
 	public void setType(Integer type) {
 		this.type = type;
 	}
 
-	public boolean isAutoDiscardOff() {
-		return autoDiscardOff;
-	}
-
-
-	public ConcurrentHashMap<String, ConcurrentHashMap<String, ApiMetric>> getAppHostServiceIdMetricMap() {
-		return appHostServiceIdMetricMap;
-	}
 
 	public ConcurrentHashMap<String,ApiMetric> getHostServiceIdMetricMap(String host){
 		return this.appHostServiceIdMetricMap.get(host);
@@ -707,22 +542,11 @@ public class ServiceApp {
 		return bandwidthCount;
 	}
 
-	public long getPreCircuitUpdateTime() {
-		return preCircuitUpdateTime;
-	}
 
 	public void setPreCircuitUpdateTime(long preCircuitUpdateTime) {
 		this.preCircuitUpdateTime = preCircuitUpdateTime;
 	}
 
-
-	public AtomicLong getClientConnClosedCount() {
-		return clientConnClosedCount;
-	}
-
-	public AtomicLong getOutBandWidth() {
-		return outBandWidth;
-	}
 
 	public void setOutBandWidth(AtomicLong outBandWidth) {
 		this.outBandWidth = outBandWidth;
@@ -738,17 +562,10 @@ public class ServiceApp {
 		this.supportSessionLimit = supportSessionLimit;
 	}
 
-	public boolean isSupportFilterRequestHeader() {
-		return supportFilterRequestHeader;
-	}
-
 	public void setSupportFilterRequestHeader(boolean supportFilterRequestHeader) {
 		this.supportFilterRequestHeader = supportFilterRequestHeader;
 	}
 
-	public boolean isSupportBehaviorSample() {
-		return supportBehaviorSample;
-	}
 
 	public void setSupportBehaviorSample(boolean supportBehaviorSample) {
 		this.supportBehaviorSample = supportBehaviorSample;
@@ -766,7 +583,6 @@ public class ServiceApp {
 		this.setSignatureParameterName(appDO.getSignatureParameterName());
 		this.setSecurityKey(appDO.getSecurityKey());
 		this.setAddUser(appDO.getAddUser());
-		this.setDockerId(appDO.getDockerId());
 		this.setContextRoot(appDO.getContextRoot());
 		this.setFlowRuleIds(appDO.getFlowRuleIds());
 		this.setBlackSelectorIds(appDO.getBlackSelectorIds());
@@ -774,15 +590,6 @@ public class ServiceApp {
 		this.setGmtModify(appDO.getGmtModify());
 		this.setStatus(appDO.getStatus());
 	}
-
-	public String getDataCenter() {
-		return dataCenter;
-	}
-
-	public void setDataCenter(String dataCenter) {
-		this.dataCenter = dataCenter;
-	}
-
 
 
 	public static class MaslaHistogram extends ConcurrentHistogram {

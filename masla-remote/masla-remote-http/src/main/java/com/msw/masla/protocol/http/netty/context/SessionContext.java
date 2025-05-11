@@ -13,9 +13,9 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Created by Gavin.peng on 2023/6/15.
  */
-public interface ChannelContext<S , T , R> {
+public interface SessionContext<S , T , R> {
 
-    AttributeKey<ChannelContext<IOSession, HttpRequest, HttpResponse>> CONTEXT_KEY = AttributeKey.newInstance("channelContext");
+    AttributeKey<SessionContext<IOSession, HttpRequest, HttpResponse>> CONTEXT_KEY = AttributeKey.newInstance("channelContext");
 
     T getHttpRequest();
 

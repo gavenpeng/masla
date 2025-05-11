@@ -1,6 +1,6 @@
 package com.msw.masla.core.push.processor;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
@@ -12,11 +12,11 @@ import java.io.OutputStream;
 /**
  * Created by Gavin.peng on 2017/6/6.
  */
-public abstract class BaseResponseProcessor<T> implements ResponseProcessor<ChannelContext<IOSession, HttpRequest, HttpResponse>, BaseEvent<HttpResponse>> {
+public abstract class BaseResponseProcessor<T> implements ResponseProcessor<SessionContext<IOSession, HttpRequest, HttpResponse>, BaseEvent<HttpResponse>> {
 
 
     @Override
-    public void process(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, OutputStream os) throws Throwable{
+    public void process(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, OutputStream os) throws Throwable{
         try{
             processHeader(requestContext,event);
             processBody(requestContext, event,(ByteArrayOutputStream)os);
@@ -28,9 +28,9 @@ public abstract class BaseResponseProcessor<T> implements ResponseProcessor<Chan
 
 
 
-    protected abstract void processHeader(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
+    protected abstract void processHeader(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event) throws Throwable;
 
 
-    protected abstract void processBody(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable;
+    protected abstract void processBody(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent<HttpResponse> event, ByteArrayOutputStream os) throws Throwable;
 
 }

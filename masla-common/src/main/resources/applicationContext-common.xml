@@ -9,15 +9,4 @@
 
     <context:annotation-config/>
     <context:component-scan base-package="com.msw.masla.common"/>
-
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="locations">
-            <list>
-                <value>
-                    classpath*:*.properties
-                </value>
-            </list>
-        </property>
-    </bean>
 </beans>

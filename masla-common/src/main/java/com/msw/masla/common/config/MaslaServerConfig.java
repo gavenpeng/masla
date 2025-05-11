@@ -2,6 +2,8 @@ package com.msw.masla.common.config;
 
 import com.alibaba.nacos.api.config.annotation.NacosValue;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,13 +13,19 @@ import org.springframework.stereotype.Component;
  * Masla global config item
  */
 @Component("maslaServerConfig")
+@DependsOn("nacosConfiguration")
 @Data
+@Slf4j
 public class MaslaServerConfig {
 
-    @NacosValue("${masla.server.protocol.support.https:false}")
+    public MaslaServerConfig() {
+        log.info("Masla init server config instance....");
+    }
+
+    @NacosValue(value = "${masla.server.protocol.support.https:false}", autoRefreshed = true)
     private boolean supportHttps;
 
-    @NacosValue("${masla.server.client.io.work.threadCount:5}")
+    @NacosValue(value = "${masla.server.client.io.work.threadCount:5}", autoRefreshed = true)
     private Integer ioThreadCount;
 
     @NacosValue("${masla.server.client.io.work.slow.threadCount:2}")
@@ -58,16 +66,16 @@ public class MaslaServerConfig {
     private Long defaultTimeoutPending;
 
 
-    @NacosValue("${masla.server.port:6081}")
+    @NacosValue(value = "${masla.server.port:6081}", autoRefreshed = true)
     private Integer port;
 
     @NacosValue("${masla.server.sslPort:443}")
     private Integer sslPort;
 
-    @NacosValue("${masla.server.backlog:10240}")
+    @NacosValue(value = "${masla.server.backlog:10240}", autoRefreshed = true)
     private Integer backlog;
 
-    @NacosValue("${masla.server.maxSession:20000}")
+    @NacosValue(value = "${masla.server.maxSession:20000}", autoRefreshed = true)
     private Integer maxSession;
 
     @NacosValue("${masla.server.sessionTimeout:120000}")

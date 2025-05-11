@@ -1,9 +1,11 @@
 package com.msw.masla.core.discovery.nacos;
 
 import com.alibaba.nacos.api.config.annotation.NacosValue;
+import com.msw.masla.common.util.StringUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -24,7 +26,7 @@ import static com.alibaba.nacos.api.PropertyKeyConst.USERNAME;
  */
 @Data
 @Component
-public class MaslaNacosDiscoveryProperties {
+public class MaslaNacosDiscoveryProperties implements InitializingBean {
 
     private static final Logger log = LoggerFactory
             .getLogger(MaslaNacosDiscoveryProperties.class);
@@ -75,11 +77,30 @@ public class MaslaNacosDiscoveryProperties {
             properties.put(ENDPOINT, endpoint.substring(0, index));
             properties.put(ENDPOINT_PORT, endpoint.substring(index + 1));
         }
-        else {
+        else if (endpoint != null) {
             properties.put(ENDPOINT, endpoint);
         }
 
         return properties;
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+        if (StringUtil.isEmptyString(this.serverAddr)) {
+            this.serverAddr = System.getProperty("nacos.server-addr");
+        }
+
+        if (StringUtil.isEmptyString(this.namespace)) {
+            this.namespace = System.getProperty("nacos.namespace");
+        }
+
+        if (StringUtil.isEmptyString(this.password)) {
+            this.password = System.getProperty("nacos.password");
+        }
+
+        if (StringUtil.isEmptyString(this.username)) {
+            this.username = System.getProperty("nacos.username");
+        }
+    }
 }

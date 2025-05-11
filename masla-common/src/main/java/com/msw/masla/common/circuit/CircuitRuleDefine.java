@@ -2,6 +2,7 @@ package com.msw.masla.common.circuit;
 
 
 import com.msw.masla.common.util.MaslaSpringContextUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 @Slf4j
+@Data
 public class CircuitRuleDefine {
 
     private static final String AUTO_UPGRADE_OR_DOWN_OPEN = "on";
@@ -20,15 +22,13 @@ public class CircuitRuleDefine {
     private final long DEFAULT_SLEEP_WINDOW_TIME = 5000l;
 
     private Long id;
-    //对应的api
-    private Long ifaceId;
+
     //对应的appId
     private Long appId;
 
     private String appName;
 
     private String ifaceUrl;
-
 
     private int self = 1;
 
@@ -88,18 +88,17 @@ public class CircuitRuleDefine {
     public CircuitRuleDefine(){
     }
 
-    public CircuitRuleDefine(Float circuitTriggerPercent, String appName, long appId){
+    public CircuitRuleDefine(Float circuitTriggerPercent, String appName){
 
         this.circuitTriggerPercent = circuitTriggerPercent;
         //默认30秒检查一次
-        this.circuitTriggerMinute = 30000l;
+        this.circuitTriggerMinute = 30000L;
         this.circuitThreshold = MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitOpenMinRequestThreshold();
-        this.upgradeOrDown = AUTO_UPGRADE_OR_DOWN_OPEN.equals(MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitAutoUpgradeOrDownSwitch())?1:0;
+        this.upgradeOrDown = AUTO_UPGRADE_OR_DOWN_OPEN.equals(MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitAutoUpgradeOrDownSwitch())? 1 : 0;
         this.circuitAttendWindow = DEFAULT_SLEEP_WINDOW_TIME;
         this.circuit = CircuitConfig.MIDDLE_PERCENT_LEVEL;//默认从50%开始熔断
         this.appName = appName;
         this.self = 0;
-        this.appId = appId;
         this.circuitBreaker = CircuitFactory.getInstance(this.appName,this);
     }
 
@@ -110,14 +109,6 @@ public class CircuitRuleDefine {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getIfaceId() {
-        return ifaceId;
-    }
-
-    public void setIfaceId(Long ifaceId) {
-        this.ifaceId = ifaceId;
     }
 
     public Long getAppId() {

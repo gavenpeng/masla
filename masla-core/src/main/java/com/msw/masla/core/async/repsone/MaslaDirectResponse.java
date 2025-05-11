@@ -1,7 +1,7 @@
 package com.msw.masla.core.async.repsone;
 
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.core.push.engine.AsyncPushEngine;
 import com.msw.masla.core.push.engine.PushEngine;
 
@@ -26,7 +26,7 @@ public class MaslaDirectResponse implements MaslaResponse {
     }
 
     @Override
-    public void witerBack(ChannelContext maslaContext) {
+    public void witerBack(SessionContext maslaContext) {
         this.pushEngine.push(maslaContext, maslaContext.getEvent());
     }
 }

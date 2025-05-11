@@ -1,6 +1,7 @@
 package com.msw.masla.server;
 
 import com.msw.masla.common.config.MaslaConfConfig;
+import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.core.discovery.healthcheck.HealthcheckManager;
 import com.msw.masla.metrics.frame.AsyncAppAgregateAdminReporter;
@@ -76,6 +77,10 @@ public class MaslaServer {
             flushThread.start();
             addShutdownHook();
             startMetricTask();
+
+            MaslaServerConfig maslaServerConfig = (MaslaServerConfig) applicationContext.getBean("maslaServerConfig");
+            LOG.info("Server config port:{}", maslaServerConfig.getPort());
+
         }catch (Throwable e){
             LOG.error("Masla startup failed:",e);
             LOG.error("Masla server init failed will exit!!!");

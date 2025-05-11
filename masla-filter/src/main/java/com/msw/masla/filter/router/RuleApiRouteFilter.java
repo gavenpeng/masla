@@ -13,7 +13,7 @@ import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.MaslaFilter;
 import com.msw.masla.filter.frame.MaslaFilterChain;
 import com.msw.masla.metrics.http.AppRequestFailedMetrics;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.DecoderResult;
@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import static com.msw.masla.common.constant.Constants.MASLA_COMMON_MATCH_PATH;
 import static com.msw.masla.common.constant.Constants.MASLA_ROUTE_TAG_HEADER;
 
 /**
@@ -45,11 +46,11 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
     @Override
     public String mappingPath() {
-        return "/*";
+        return MASLA_COMMON_MATCH_PATH;
     }
 
     @Override
-    public void doFilter(ChannelContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event, MaslaFilterChain filterChain) throws FilterException {
+    public void doFilter(SessionContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event, MaslaFilterChain filterChain) throws FilterException {
 
         HttpRequest httpRequest = context.getHttpRequest();
 
@@ -66,7 +67,7 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
         String contextRoot = context.getSession().getContextRoot();
         String path = context.getSession().getPath();
-
+        String serviceName = stripLeadingSlash(contextRoot);
 
         DefaultRouteRuleFactory routeRuleFactory = DefaultRouteRuleFactory.getDefaultRouteRuleFactoryInstance();
         RouteRuleCache routeRuleCache = routeRuleFactory.getRouteRuleCache();
@@ -78,7 +79,8 @@ public class RuleApiRouteFilter implements MaslaFilter {
         if (rule == null) {
             //second pattern match with path
             Map<String, TreeMap<Pattern, RouteRule>> routeRulePattern =  RouteRuleCache.getAppPatterRouteRule();
-            TreeMap<Pattern, RouteRule> appRouteRule = routeRulePattern.get(contextRoot);
+
+            TreeMap<Pattern, RouteRule> appRouteRule = routeRulePattern.get(serviceName);
             if (appRouteRule != null) {
                 Set<Map.Entry<Pattern, RouteRule>> rulePatterSet = appRouteRule.entrySet();
                 for (Map.Entry<Pattern, RouteRule> entry : rulePatterSet) {
@@ -103,14 +105,12 @@ public class RuleApiRouteFilter implements MaslaFilter {
             return;
         }
 
-
-
-        ServiceApp appDO = RouteRuleCache.getRouteAppCache(routeRule.getAppName());
+        ServiceApp appDO = RouteRuleCache.getRouteAppCache(rule.getAppName());
 
         MaslaAsyncContext maslaAsyncContext = (MaslaAsyncContext) context;
-        maslaAsyncContext.setRouteRule(routeRule);
+        maslaAsyncContext.setRouteRule(rule);
         maslaAsyncContext.setAppDO(appDO);
-        maslaAsyncContext.setTimeout(routeRule.getTimeout());
+        maslaAsyncContext.setTimeout(rule.getTimeout());
         if (StringUtil.isEmptyString(rule.getRewritePath())) {
             maslaAsyncContext.setRewritePath(rule.getRewritePath());
         }
@@ -150,6 +150,15 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
     }
 
+
+    private String stripLeadingSlash(String contextRoot) {
+        if (contextRoot != null && contextRoot.startsWith("/")) {
+            return contextRoot.substring(1);
+        }
+        return contextRoot;
+    }
+
+
     @Override
     public void init() {
 
@@ -161,7 +170,7 @@ public class RuleApiRouteFilter implements MaslaFilter {
     }
 
 
-    private boolean checkDecodeResult(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
+    private boolean checkDecodeResult(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, ServiceApp appDO){
         try {
 
             int requestLineLength = requestContext.getRequestLineSize();
@@ -193,12 +202,12 @@ public class RuleApiRouteFilter implements MaslaFilter {
         return true;
     }
 
-    private void writeHttpDecodeErrorResponse(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext,String message) {
+    private void writeHttpDecodeErrorResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext,String message) {
         requestContext.getSession().writeAndClose(
                 NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, message, Constants.MASLA_RESPONSE_HEADER_PROTOCOL_EXCEPTION));
     }
 
-    private void writeUNValidRouteUrl(ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext) {
+    private void writeUNValidRouteUrl(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
         String unvalidRoute = "Not found service by request url:" + requestContext.getRequestUrl();
         requestContext.getSession().writeAndClose(
                 NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, unvalidRoute, Constants.MASLA_RESPONSE_HEADER_UNVALID_PATH));

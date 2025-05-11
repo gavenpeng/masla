@@ -15,7 +15,7 @@ import com.msw.masla.core.invoker.loadbalance.MaslaDefaultLoadBalanceFactory;
 import com.msw.masla.core.push.engine.AsyncPushEngine;
 import com.msw.masla.core.push.engine.PushEngine;
 import com.msw.masla.metrics.http.QpsMetrics;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.protocol.http.netty.exception.MaslaException;
@@ -89,7 +89,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
 
 
     @Override
-    public void doInvoke(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext) {
+    public void doInvoke(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext) {
         HttpRequest httpRequest = maslaContext.getHttpRequest();
         ServiceApp serviceApp = maslaContext.getService();
         try {
@@ -145,7 +145,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
         return e instanceof RejectedExecutionException;
     }
 
-    private void countQueueFull(ChannelContext maslaContext){
+    private void countQueueFull(SessionContext maslaContext){
         try {
             String serviceId = maslaContext.getServiceIdentify();
             if (serviceId != null) {
@@ -160,7 +160,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
     private void sendRequest(HttpRequest httpRequest,
-                             MaslaChannelPool channelPool, ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel, BaseEvent event) throws Exception{
+                             MaslaChannelPool channelPool, SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel, BaseEvent event) throws Exception{
         try {
             if(LOG.isDebugEnabled()){
                 LOG.debug("Masla start to send request {} to remote {}", maslaContext.getHttpRequest().uri(), channel.remoteAddress());
@@ -181,7 +181,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
                     maslaContext.setScheduledFuture(timeoutFuture);
                     final ChannelFuture future = channel.writeAndFlush(httpRequest,channel.newProgressivePromise());
                     future.addListener(new AsyncRequestExecutionCallback(maslaContext,channelPool));
-                    ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext = channel.attr(ChannelContext.CONTEXT_KEY).get();
+                    SessionContext<IOSession, HttpRequest, HttpResponse> requestContext = channel.attr(SessionContext.CONTEXT_KEY).get();
                     if(requestContext != null) {
                         channelPool.addPendingOutboundBytes(requestContext.getRequestLineSize()+requestContext.getRequestHeaderSize()+requestContext.getRequestBodySize());
                     }
@@ -208,7 +208,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
 
 
     private void closeAndRetry(final HttpRequest httpRequest,
-                               final MaslaChannelPool channelPool, final ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, final Channel channel, final Throwable cause) throws Exception {
+                               final MaslaChannelPool channelPool, final SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, final Channel channel, final Throwable cause) throws Exception {
 
         this.cleanChannelContext(maslaContext,channel);
         final BaseEvent event = maslaContext.getEvent();
@@ -225,7 +225,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    private void doRetry(MaslaChannelPool channelPool, HttpRequest httpRequest, ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, Channel channel, Throwable cause) throws Exception{
+    private void doRetry(MaslaChannelPool channelPool, HttpRequest httpRequest, SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, Channel channel, Throwable cause) throws Exception{
         this.releaseChannel(channel);
         if (event.isRetryable()) {
             long pendingBytes = maslaContext.getRequestLineSize()+ maslaContext.getRequestHeaderSize()+ maslaContext.getRequestBodySize();
@@ -240,7 +240,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
 
 
 
-    private MaslaChannelPool retrySelectHostInstance(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, HostInstance hostInstance) throws Exception {
+    private MaslaChannelPool retrySelectHostInstance(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, HostInstance hostInstance) throws Exception {
 
         List<HostInstance> instanceList = maslaNacosServiceDiscovery.getAvailableInstances(maslaContext.getService().getName(), false);
         List<HostInstance> tagList = maslaNacosServiceDiscovery.getAvailableInstances(maslaContext.getService().getName(), true);
@@ -264,15 +264,15 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    private void bindChannelContext(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel) {
+    private void bindChannelContext(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel) {
         //TODO context is reuse for thread local
-        channel.attr(ChannelContext.CONTEXT_KEY).set(maslaContext);
+        channel.attr(SessionContext.CONTEXT_KEY).set(maslaContext);
         //channel.attr(BaseEvent.EVENT_KEY).set(event);
     }
 
 
-    private boolean cleanChannelContext(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel){
-        if(channel.attr(ChannelContext.CONTEXT_KEY).getAndSet(null) != null) {
+    private boolean cleanChannelContext(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, Channel channel){
+        if(channel.attr(SessionContext.CONTEXT_KEY).getAndSet(null) != null) {
             if (maslaContext.getScheduledFuture() != null) {
                 maslaContext.getScheduledFuture().cancel(false);
             }
@@ -282,7 +282,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    private void localExecFailed(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, final Throwable e) {//todo 添加监控，app级别、异常分类
+    private void localExecFailed(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, final Throwable e) {//todo 添加监控，app级别、异常分类
         //recordFaildMertic(maslaContext);
         BaseEvent event = maslaContext.getEvent();
         if(event != null) {
@@ -308,7 +308,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    private void asyncExecFailed(final ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, final MaslaChannelPool pool, final Channel channel, final Throwable e, final BaseEvent event){
+    private void asyncExecFailed(final SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, final MaslaChannelPool pool, final Channel channel, final Throwable e, final BaseEvent event){
 
         if(LOG.isWarnEnabled()) {
             LOG.warn("Masla exec request {} status {} exec count {} async failed:", maslaContext.getRequestUrl(), event.getState(), event.getExecCount(), e);
@@ -363,7 +363,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
     }
 
 
-    private void responseError(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, Throwable e) {
+    private void responseError(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, Throwable e) {
         PushEngine pushEngine = AsyncPushEngine.getPushEngine(factory);
         Throwable ee = e instanceof MaslaException ?e.getCause():e;
         if(ee == null){
@@ -394,11 +394,11 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
 
         private HttpRequest httpRequest;
         private MaslaChannelPool channelPool;
-        private ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext;
+        private SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext;
         private BaseEvent event;
 
         AsyncConnRequestCallback(HttpRequest httpRequest, MaslaChannelPool channelPool,
-                                 ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event){
+                                 SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event){
             this.httpRequest = httpRequest;
             this.channelPool = channelPool;
             this.maslaContext = maslaContext;
@@ -480,7 +480,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
      * @param future
      * @return
      */
-    private boolean checkRequestTimeout(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, MaslaChannelPool channelPool, Future<Channel> future){
+    private boolean checkRequestTimeout(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, BaseEvent event, MaslaChannelPool channelPool, Future<Channel> future){
         //检查获取超时的时间，如果获取链接耗时过多，大于超时时间，则不再转发。
         try {
             //copy的流量不检查
@@ -523,11 +523,11 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
      */
     class AsyncRequestExecutionCallback implements GenericProgressiveFutureListener<ChannelProgressiveFuture> {
 
-        private ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext;
+        private SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext;
         private MaslaChannelPool channelPool;
 
 
-        AsyncRequestExecutionCallback(ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext, MaslaChannelPool channelPool){
+        AsyncRequestExecutionCallback(SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext, MaslaChannelPool channelPool){
             this.maslaContext = maslaContext;
             this.channelPool = channelPool;
         }
@@ -582,7 +582,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
                 }
             }else{
                 //检查是否可以重试
-                ChannelContext<IOSession, HttpRequest, HttpResponse> requestContext = channel.attr(ChannelContext.CONTEXT_KEY).get();
+                SessionContext<IOSession, HttpRequest, HttpResponse> requestContext = channel.attr(SessionContext.CONTEXT_KEY).get();
                 if(requestContext != null && future.cause() instanceof ClosedChannelException
                         && event.isRetryable()) {
                     FullHttpRequest retryHttpRequest = ((FullHttpRequest) maslaContext.getHttpRequest()).duplicate();

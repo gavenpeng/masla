@@ -311,9 +311,11 @@ public abstract class MaslaMessageAggregator<I, S, C extends ByteBufHolder, O ex
 
 
                 int contentSize = currentMessage.content().readableBytes();
-                if (currentMessage instanceof DecoderResultProvider) {
-                    ((DecoderResultProvider) currentMessage).setDecoderResult(
-                            DecoderResult.failure(new TooLongFrameException("Request entity too large: " + contentSize)));
+                if (contentSize > maxContentLength) {
+                    if (currentMessage instanceof DecoderResultProvider) {
+                        ((DecoderResultProvider) currentMessage).setDecoderResult(
+                                DecoderResult.failure(new TooLongFrameException("Request entity too large: " + contentSize)));
+                    }
                 }
 
                 out.add(currentMessage);

@@ -1,6 +1,6 @@
 package com.msw.masla.protocol.http.netty.http.connection;
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
@@ -67,7 +67,7 @@ public class MaslaHttpClientHandler extends ChannelInboundHandlerAdapter {
             disalbeMultiplexAndClose(ctx.channel());
         }
         //LOG.info("Found channel local {} is receive FIN request",ctx.channel().remoteAddress());
-        ChannelContext maslaContext = ctx.channel().attr(ChannelContext.CONTEXT_KEY).get();
+        SessionContext maslaContext = ctx.channel().attr(SessionContext.CONTEXT_KEY).get();
         if(maslaContext != null){
             LOG.warn("Masla found channel {} is closed in exclusive state for request {}",ctx.channel().remoteAddress(), maslaContext.getRequestUrl());
             maslaDecode.receiveException(ctx.channel(), new ServerClosedChannelException("connection is closed by server:" + ctx.channel().remoteAddress()));
@@ -85,7 +85,7 @@ public class MaslaHttpClientHandler extends ChannelInboundHandlerAdapter {
                 }else{
                     LOG.info("Masla found channel {} is idle but already close",ctx.channel().remoteAddress());
                 }
-                ChannelContext<IOSession, HttpRequest, HttpResponse> maslaContext = ctx.channel().attr(ChannelContext.CONTEXT_KEY).get();
+                SessionContext<IOSession, HttpRequest, HttpResponse> maslaContext = ctx.channel().attr(SessionContext.CONTEXT_KEY).get();
                 if(maslaContext != null){
                     BaseEvent event = maslaContext.getEvent();
                     long now = TimeUnit.NANOSECONDS.toMillis(System.nanoTime());

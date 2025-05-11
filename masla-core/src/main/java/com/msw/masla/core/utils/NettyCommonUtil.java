@@ -5,7 +5,7 @@ import com.msw.masla.common.util.CollectionUtil;
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.common.constant.Constants;
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.util.BufferUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -304,7 +303,7 @@ public class NettyCommonUtil {
    * @param context 请求上下文
    * @return 服务uri
    */
-  public static String getServiceId(ChannelContext context) {
+  public static String getServiceId(SessionContext context) {
 
 
       StringBuilder builder = StringBuilderHolder.getGlobal();
@@ -329,7 +328,7 @@ public class NettyCommonUtil {
    * @param requestContext
    * @return
    */
-  public static boolean isMaslaMetaPath(ChannelContext requestContext) {
+  public static boolean isMaslaMetaPath(SessionContext requestContext) {
     //ADMIN的请求有直接到对应的servlet处理
     String requestPath = requestContext.getRequestUrl();
     if (requestPath.equals(Constants.MASLA_META_CONTEXT)

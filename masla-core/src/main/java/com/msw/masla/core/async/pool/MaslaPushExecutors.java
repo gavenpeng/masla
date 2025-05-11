@@ -23,27 +23,17 @@ public class MaslaPushExecutors {
     private static final int DEFAULT_POOL_QUEUESIZE = 500;
 
 
-    @NacosValue("${masla.push.thread.pool.core.size}")
+    @NacosValue(value = "${masla.push.thread.pool.core.size:10}", autoRefreshed = true)
     private Integer coreSize;
 
-    @NacosValue("${masla.push.thread.pool.core.maxsize}")
+    @NacosValue(value = "${masla.push.thread.pool.core.maxsize:20}", autoRefreshed = true)
     private Integer maxSize;
 
-    @NacosValue("${masla.push.thread.pool.core.queuesize}")
+    @NacosValue(value = "${masla.push.thread.pool.core.queuesize:200}", autoRefreshed = true)
     private Integer queueSize;
 
     private ThreadPoolExecutor executor;
 
-    public static ThreadPoolExecutor newCachedThreadPool() {
-        //ProperitesContainer pc = getPropContainer(side);
-        int coreSize = DEFAULT_POOL_CORESIZE;
-        int maxSize = DEFAULT_POOL_MAXSIZE;
-        long idleTime = DEFAULT_POOL_IDLETIME;
-        int capacity = DEFAULT_POOL_QUEUESIZE;
-        BlockingQueue<Runnable> eventQueue = new LinkedBlockingQueue<Runnable>(capacity);
-        ThreadPoolExecutor tpe = new ThreadPoolExecutor(coreSize, maxSize, idleTime, TimeUnit.SECONDS, eventQueue, new MaslaThreadFactory(), new MaslaDiscardOldestPolicy());
-        return tpe;
-    }
 
     @PostConstruct
     public void init(){

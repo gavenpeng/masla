@@ -1,7 +1,7 @@
 package com.msw.masla.core.async.pool;
 
 
-import com.msw.masla.protocol.http.netty.context.ChannelContext;
+import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 
 /**
@@ -9,21 +9,21 @@ import com.msw.masla.protocol.http.netty.event.BaseEvent;
  */
 public  abstract class PushTask implements Runnable {
 
-    protected ChannelContext context;
+    protected SessionContext context;
 
     protected BaseEvent event;
 
 
-    public PushTask(ChannelContext context, BaseEvent event){
+    public PushTask(SessionContext context, BaseEvent event){
         this.reset(context,event);
     }
 
-    public void reset(ChannelContext context, BaseEvent event){
+    public void reset(SessionContext context, BaseEvent event){
         this.context = context;
         this.event = event;
     }
 
-    public ChannelContext getContext() {
+    public SessionContext getContext() {
         return context;
     }
 
