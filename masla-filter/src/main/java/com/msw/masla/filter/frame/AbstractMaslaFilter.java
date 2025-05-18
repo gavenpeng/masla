@@ -34,8 +34,9 @@ public abstract class AbstractMaslaFilter implements MaslaFilter{
 
         try {
             if (!apply(requestContext, event)) {
-                //return;
+                return;
             }
+
         }catch (Throwable e){
             LOG.error("Masla found request {} do filter {} failed:",requestContext.getRequestUrl(),this.getName(),e);
         }

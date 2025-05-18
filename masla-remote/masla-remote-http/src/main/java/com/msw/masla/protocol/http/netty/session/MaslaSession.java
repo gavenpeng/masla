@@ -284,7 +284,6 @@ public class MaslaSession implements IOSession {
         if(close) {
             this.isError = true;
         }
-//        active = false;
         DefaultHttpResponse errorResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1,httpResponseStatus);
         errorResponse.headers().set(Constants.MASLA_RESPONSE_HEADER_KEY,headerFlag);
         flush(errorResponse,true);

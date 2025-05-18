@@ -9,6 +9,7 @@ import com.msw.masla.core.router.rule.RouteRuleCache;
 import com.msw.masla.protocol.http.netty.http.HostInstance;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -40,8 +41,9 @@ public class DefaultRouteRuleFactory {
         this.routeRuleCache = new RouteRuleCache();
     }
 
-    public void intRouteRuleFile() throws Exception{
-        this.nacosRouteConfig = new NacosRouteConfig();
+    public void intRouteRuleFile(MaslaNacosServiceDiscovery maslaNacosServiceDiscovery) throws Exception{
+        this.maslaNacosServiceDiscovery = maslaNacosServiceDiscovery;
+        this.nacosRouteConfig = new NacosRouteConfig(this);
         this.nacosRouteConfig.init();
         this.loadRouteRule();
     }
@@ -50,17 +52,16 @@ public class DefaultRouteRuleFactory {
         return maslaRouteRuleProperties.getRoutes();
     }
 
-    private void loadRouteRule() throws Exception {
-        //String routeFileName = MaslaRouteRuleProperties.MASLA_GATEWAY_ROUTE_RULE_FILE_NAME;
-        List<RouteRule> routeRules = routeRuleParse.parseRouteRule(nacosRouteConfig.getRouteProperties());
+    public void loadRouteRule() throws Exception {
+        Collection<RouteRule> routeRules = routeRuleParse.parseRouteRule(nacosRouteConfig.getRouteProperties());
         this.routeRuleCache.refreshApiCache(routeRules);
     }
 
     public void initRateLimiter(FlowSelectorRule selectorRule, RouteRule routeRule) {
-        synchronized (selectorRule) {
+        synchronized (this) {
             if (routeRule.getRateLimiter() == null) {
                 int instanceCount = maslaNacosServiceDiscovery.getServiceInstanceSize(routeRule.getAppName());
-                long permitsPerSecond = selectorRule.getMaxFreq() / selectorRule.getInterval() / instanceCount;
+                double permitsPerSecond = (double) selectorRule.getMaxFreq() / selectorRule.getInterval() / instanceCount;
                 //创建令牌痛限流器
                 RateLimiter rateLimiter = RateLimiter.create(permitsPerSecond);
                 routeRule.setRateLimiter(rateLimiter);

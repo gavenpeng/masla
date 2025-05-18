@@ -36,9 +36,7 @@ public class FlowRuleMatchUtils {
             String configHeaderValue = flowSelectorRule.getHeaderKeyValue();
 
             String headerValue = requestContext.getHttpRequest().headers().get(headerKey);
-            if (!configHeaderValue.equals(headerValue)) {
-                return false;
-            }
+            return configHeaderValue.equals(headerValue);
         }
 
         return true;

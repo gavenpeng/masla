@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * Author: Gavin.peng
  * Date: 2024/8/17
  * Description:
- * app/serviceid 级别的流量控制,级别秒级别的qps，允许有一定的波动，因为低峰时没有用完的令牌，
+ * app/service id 级别的流量控制,级别秒级别的qps，允许有一定的波动，因为低峰时没有用完的令牌，
  * 会给到高峰用，超过阀值则直接拒绝
  */
 @Slf4j

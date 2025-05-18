@@ -127,7 +127,7 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
 
 		//init masla api route properties
 		DefaultRouteRuleFactory routeRuleFactory = DefaultRouteRuleFactory.getDefaultRouteRuleFactoryInstance();
-		routeRuleFactory.intRouteRuleFile();
+		routeRuleFactory.intRouteRuleFile(nacosServiceDiscovery);
 
 		//register healthcheck
 		HealthcheckManager.getInstance().registerMaslaNacosServiceDiscovery(nacosServiceDiscovery);

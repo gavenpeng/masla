@@ -6,6 +6,7 @@ import com.msw.masla.common.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +51,12 @@ public class RouteRuleCache  {
 
     }
 
-    public void refreshApiCache(List<RouteRule> routeRules){
+    public void refreshApiCache(Collection<RouteRule> routeRules){
 
         //如果数据库出现异常，一个都查不到，则不更新缓存，防止数据被清空
-        if (null == routeRules || routeRules.size() == 0) {
+        if (null == routeRules || routeRules.isEmpty()) {
             log.error("masla route rule cache load failed, route rule is empty!!!");
+            return;
         }
 
         if(ROUTE_APP_CACHE == null){

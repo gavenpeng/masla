@@ -63,6 +63,16 @@
     <commons.pool2.version>2.4.2</commons.pool2.version>
     <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
   </properties>
+
+  <modules>
+    <module>masla-common</module>
+    <module>masla-core</module>
+    <module>masla-server</module>
+    <module>masla-filter</module>
+    <module>masla-remote</module>
+    <module>masla-metrics</module>
+  </modules>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -453,6 +463,29 @@
         </executions>
       </plugin>
 <!--      <plugin>-->
+<!--        <groupId>com.mycila</groupId>-->
+<!--        <artifactId>license-maven-plugin</artifactId>-->
+<!--        <version>4.3.rc1</version>-->
+<!--        <configuration>-->
+<!--          <header>${basedir}/license-header.txt</header>-->
+<!--          <includes>-->
+<!--            <include>**/*.java</include>-->
+<!--          </includes>-->
+<!--          <strictCheck>true</strictCheck>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>check-license</id>-->
+<!--            <phase>validate</phase>-->
+<!--            <goals>-->
+<!--              <goal>check</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
+
+      <!--      <plugin>-->
 <!--        <groupId>org.apache.maven.plugins</groupId>-->
 <!--        <artifactId>maven-checkstyle-plugin</artifactId>-->
 <!--        <version>${maven-checkstyle-plugin.version}</version>-->
@@ -476,15 +509,7 @@
 <!--      </plugin>-->
     </plugins>
   </build>
-  <modules>
-    <module>masla-core</module>
-    <module>masla-common</module>
-    <module>masla-server</module>
-    <module>masla-filter</module>
-    <module>masla-remote</module>
-    <module>masla-metrics</module>
 
-  </modules>
   <distributionManagement>
     <snapshotRepository>
       <!-- The ID here must be exactly the same as the value

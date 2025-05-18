@@ -3,6 +3,7 @@ package com.msw.masla.core.router;
 import com.msw.masla.core.router.rule.RouteRule;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,7 +14,7 @@ import java.util.Properties;
  */
 public interface RouteRuleParse {
 
-    public List<RouteRule> parseRouteRule(Properties properties) throws Exception;
+    public Collection<RouteRule> parseRouteRule(Properties properties) throws Exception;
 
-    public List<RouteRule> parseRouteRule(String routeFile) throws Exception;
+    public Collection<RouteRule> parseRouteRule(String routeFile) throws Exception;
 }
