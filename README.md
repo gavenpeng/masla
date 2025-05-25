@@ -6,27 +6,28 @@ A fully asynchronous Java API gateway, validated with millions of concurrent C-e
 running only jdk, not dependency other compensate
 
 # Feature
-- service discovery
+- Service Discovery
+  Masla API Gateway currently only supports Nacos as the service registry. It performs service discovery via Nacos to automatically detect dynamic changes in services.
 
- masla api gateway current only support nacos register center，通过nacos 服务发现来
- 自动设别service的动态变更
+- Traffic Control
+  Masla provides built-in support for traffic control. You can configure rate limiting for each API using a token bucket algorithm, which is single-node rate limiting.
 
-- 流量控制
+- Traffic Circuit Breaking
+  Masla API Gateway has a default circuit breaking mechanism. When the failure rate reaches 50%, circuit breaking is triggered. It supports intelligent auto-upgrade and auto-recovery mechanisms.
 
-masla 默认支持流量控制，通过配置的形式，可以为每个api配置限流，通过令牌桶实现，是单机限流
-- 流量熔断
+- Black/White List
+  Service-level support including matching by path, client IP, and header parameters.
 
-masla api gateway 默认支持熔断机制，默认异常比例达到50%时，会触发熔断，熔断支持智能自动升降级自动恢复
+Global blacklist support.
 
-- 黑白名单
-  - service level,support path, client ip, header params match
-- 全局黑名单
-- 慢启动
-  - 支持对新加入的service 实例的流量执行类似tcp慢启动的机制，慢启动期间缓慢给流量，慢启动窗口过后，就正常给流量
-- 负载均衡
-  - 默认提供RoundRobin 负载均衡器
-- 健康检查
-  - 需要service支持/healthcheck的请求，支持健康检查的service，来实现无损发布。
+- Warm-up / Slow Start
+  Supports a slow start mechanism for newly added service instances, similar to TCP slow start, where traffic is gradually increased. Once the warm-up window ends, normal traffic distribution resumes.
+
+- Load Balancing
+  Masla provides Round-Robin as the default load balancing strategy.
+
+- Health Check
+  Requires services to support /healthcheck endpoint. With health check support, zero-downtime deployment can be achieved.
 
 
 # Architect
