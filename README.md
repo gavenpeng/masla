@@ -19,7 +19,15 @@ masla 默认支持流量控制，通过配置的形式，可以为每个api配�
 masla api gateway 默认支持熔断机制，默认异常比例达到50%时，会触发熔断，熔断支持智能自动升降级自动恢复
 
 - 黑白名单
+  - service level,support path, client ip, header params match
 - 全局黑名单
+- 慢启动
+  - 支持对新加入的service 实例的流量执行类似tcp慢启动的机制，慢启动期间缓慢给流量，慢启动窗口过后，就正常给流量
+- 负载均衡
+  - 默认提供RoundRobin 负载均衡器
+- 健康检查
+  - 需要service支持/healthcheck的请求，支持健康检查的service，来实现无损发布。
+
 
 # Architect
 
