@@ -5,10 +5,9 @@ import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.core.ServiceIdFormatUtil;
 import com.msw.masla.core.async.context.MaslaAsyncContext;
-import com.msw.masla.core.router.DefaultRouteRuleFactory;
 import com.msw.masla.core.router.rule.RouteRule;
 import com.msw.masla.core.router.rule.RouteRuleCache;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.MaslaFilter;
 import com.msw.masla.filter.frame.MaslaFilterChain;
@@ -100,11 +99,12 @@ public class RuleApiRouteFilter implements MaslaFilter {
         }
 
         ServiceApp routeService = RouteRuleCache.getRouteAppCache(rule.getAppName());
-
+        Map<String, String> headers = MaslaHttpUtil.getHeaderMap(httpRequest);
         MaslaAsyncContext maslaAsyncContext = (MaslaAsyncContext) context;
         maslaAsyncContext.setRouteRule(rule);
         maslaAsyncContext.setService(routeService);
         maslaAsyncContext.setTimeout(rule.getTimeout());
+        maslaAsyncContext.setHeaders(headers);
         if (StringUtil.isEmptyString(rule.getRewritePath())) {
             maslaAsyncContext.setRewritePath(rule.getRewritePath());
         }
@@ -195,13 +195,13 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
     private void writeHttpDecodeErrorResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext,String message) {
         requestContext.getSession().writeAndClose(
-                NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, message, Constants.MASLA_RESPONSE_HEADER_PROTOCOL_EXCEPTION));
+                MaslaHttpUtil.createResponse(HttpResponseStatus.BAD_REQUEST, message, Constants.MASLA_RESPONSE_HEADER_PROTOCOL_EXCEPTION));
     }
 
     private void writeUNValidRouteUrl(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
         String unvalidRoute = "Not found service by request url:" + requestContext.getRequestUrl();
         requestContext.getSession().writeAndClose(
-                NettyCommonUtil.createResponse(HttpResponseStatus.BAD_REQUEST, unvalidRoute, Constants.MASLA_RESPONSE_HEADER_UNVALID_PATH));
+                MaslaHttpUtil.createResponse(HttpResponseStatus.BAD_REQUEST, unvalidRoute, Constants.MASLA_RESPONSE_HEADER_UNVALID_PATH));
     }
 
 }

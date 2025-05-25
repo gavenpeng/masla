@@ -6,7 +6,7 @@ package com.msw.masla.common.enums;
  */
 public enum HostStatus {
 
-    ENABLE(1), DISENABLE(-1), PUBLISH(2),TEMP_DISENABLE(3),EXCLUDE(4),EXC_DISENABLE(5),EXC_TEMP_DISENABLE(6),BUSYING(7);
+    ENABLE(1), DISENABLE(-1), PUBLISH(2), TEMP_DISENABLE(3), EXCLUDE(4), EXC_DISENABLE(5), EXC_TEMP_DISENABLE(6), BUSYING(7);
 
     private int code;
 

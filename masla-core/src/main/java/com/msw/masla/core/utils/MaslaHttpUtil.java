@@ -23,13 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by Gavin.peng on 17/10/23.
+ * Created by Gavin.peng on 2023/10/23.
  */
 
 @Slf4j
-public class NettyCommonUtil {
+public class MaslaHttpUtil {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NettyCommonUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MaslaHttpUtil.class);
 
 
   //链接达到限制的响应
@@ -60,32 +60,8 @@ public class NettyCommonUtil {
   public static final HttpResponseStatus REQUEST_FAILED = new HttpResponseStatus(
           MaslaError.CIRCUIT_BREAKER_CODE, "Request Failed");
 
-
   public static String CLIENT_REAL_IP = "X-REAL-IP";
-  private static String CLIENT_REAL_PORT = "X-REAL-PORT";
 
-  private static int BODY_SAMPLE_LENGTH_LIMIT = 512 * 1024;
-
-  //大body请求采样阀值3M，超过该值放弃
-  private static int BIG_BODY_LENGTH_LIMIT = 3145728;
-
-  /**
-   * 获取IP，能够获得经过代理之后的真实IP
-   */
-  public static String getRemoteAddr(HttpRequest request, Channel channel) {
-    String ip = request.headers().get("x-forwarded-for");
-    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-      ip = request.headers().get("Proxy-Client-IP");
-    }
-    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-      ip = request.headers().get("WL-Proxy-Client-IP");
-    }
-    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-      ip = channel.remoteAddress().toString();
-    }
-
-    return ip;
-  }
 
   public static String getClientRealIp(HttpRequest request, Channel channel) {
     String ip = getRealIp(request.headers());
@@ -117,14 +93,11 @@ public class NettyCommonUtil {
     return ips.split(",")[0];
   }
 
-  public static String getClientRealPort(HttpRequest request) {
-    return request.headers().get(CLIENT_REAL_PORT);
-  }
 
   public static HttpResponse createResponse(HttpResponseStatus httpResponseStatus,
       String responseContentStr) {
 
-    return createResponse(httpResponseStatus,responseContentStr,Constants.MASLA_RESPONSE_HEADER_KEY_VALUE);
+    return createResponse(httpResponseStatus, responseContentStr, responseContentStr);
 
   }
 

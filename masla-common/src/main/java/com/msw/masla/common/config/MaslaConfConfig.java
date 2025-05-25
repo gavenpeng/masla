@@ -85,8 +85,12 @@ public class MaslaConfConfig {
     @NacosValue("${masla.circuit.upgrade.threshold:0.5}")
     private String circuitUpgradeThreshold;
 
-    @NacosValue("${masla.circuit.open.min.request.threshold:100}")
-    private Integer circuitOpenMinRequestThreshold = 100;
+    @NacosValue(value = "${masla.circuit.open.min.request.threshold:100}", autoRefreshed = true)
+    private Integer circuitOpenMinRequestThreshold;
+
+    @NacosValue(value = "${masla.circuit.open.trigger.second.threshold:10}", autoRefreshed = true)
+    private Integer circuitTriggerSecond;
+
 
     @NacosValue("${masla.circuit.auto.upgradeordown.switch:on}")
     private String circuitAutoUpgradeOrDownSwitch;

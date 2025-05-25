@@ -1,6 +1,7 @@
 package com.msw.masla.core.invoker.loadbalance;
 
 import com.msw.masla.common.util.StringUtil;
+import com.msw.masla.core.discovery.nacos.HostProfile;
 import com.msw.masla.protocol.http.netty.http.HostInstance;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,9 +33,31 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             return null;
         }
 
-        int pos = this.position.incrementAndGet() & Integer.MAX_VALUE;
+        int instanceCount = hostInstances.size();
 
-        return hostInstances.get(pos % hostInstances.size());
+        if (instanceCount == 1) {
+            return hostInstances.get(0);
+        }
+
+        HostProfile selectedHost = null;
+        while (instanceCount-- > 0) {
+
+            int pos = this.position.incrementAndGet() & Integer.MAX_VALUE;
+            HostProfile routeHost = (HostProfile) hostInstances.get(pos % hostInstances.size());
+            if (!routeHost.isAvailable()) {
+                continue;
+            }
+            if (routeHost.slowStartup()) {
+                selectedHost = routeHost;
+                continue;
+            }
+
+            return selectedHost;
+        }
+
+        return selectedHost;
+
+
     }
 
     @Override

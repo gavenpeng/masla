@@ -12,7 +12,7 @@ import java.util.List;
 public class ConsistentHashLoadBalance extends AbstractLoadBalance {
 
 
-    public static final String NAME = "consistenthash";
+    public static final String NAME = "CHash";
 
     @Override
     protected HostInstance doSelect(List<HostInstance> hostInstances) {

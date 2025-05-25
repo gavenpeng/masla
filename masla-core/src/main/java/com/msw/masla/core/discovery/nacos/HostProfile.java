@@ -14,12 +14,12 @@ public class HostProfile implements HostInstance {
 
     public static final long WAKE_UP_COMPLETE_TIME = 180000;
 
-    //2分钟，如果一个host 出现忙，则这个时间内不给流量，这个时间是一个慢启动的时间，过了这个时间，其他的机器应该已经预热完成。
     public static final long FREE_TIME_AFTER_BUSY = 120000000000l;//单位纳秒
 
     public static final long FLOW_INCRENCE_INTERVAL = 10000;
 
     public static final long ONE_MINUTE = 60000;
+
     public static final long TWO_MINUTE = 120000;
 
     public static final int XCWND = 1;
@@ -27,7 +27,6 @@ public class HostProfile implements HostInstance {
     public static final int UPGRADE_MULTIPLE = 2;
 
     private String serviceId;
-
 
     private String host;
 
@@ -83,7 +82,6 @@ public class HostProfile implements HostInstance {
         this.host = host;
         this.port = port;
         this.curStatus = status;
-//        this.relivePolicy = new DefaultRelivePolicy(hostIp);
         this.curWeight = new AtomicInteger(weight);
         this.isolationType = isolationType;
         this.appId = appId;
@@ -121,7 +119,6 @@ public class HostProfile implements HostInstance {
 
     public void resetTimeout(){
         this.lastMarkTimeoutTime = 0;
-//        this.timeoutCount.set(0);
     }
 
     public HostStatus getCurStatus() {
@@ -157,16 +154,7 @@ public class HostProfile implements HostInstance {
         return HostInstance.super.getScheme();
     }
 
-    public Long getAppId() {
-        return appId;
-    }
-
-    public void setAppId(Long appId) {
-        this.appId = appId;
-    }
-
     public void setServiceId(String serviceId) {
-
         this.serviceId = serviceId;
     }
 
@@ -180,9 +168,6 @@ public class HostProfile implements HostInstance {
         int result = 1;
         result = prime * result + ((host == null) ? 0 : host.hashCode());
         result = prime * result + port;
-        //增加appid做为标示，云原生时代，pod的ip会漂移，即同一个ip会在不同的时间
-        //属于不同的app。
-//        result = prime * result + appId.intValue();
         return result;
     }
 
@@ -196,20 +181,17 @@ public class HostProfile implements HostInstance {
         if (host == null) {
             return other.host == null;
         }
-        else if (!appId.equals(other.appId)) return false;
+        //else if (!serviceId.equals(other.serviceId)) return false;
         else if (!host.equals(other.host)) return false;
         else return port == other.port;
     }
 
-
-
     public boolean isWakeUpComplete() {
-        //            LOG.info("the host:{} is wake up complete.", hostIp);
         return (System.currentTimeMillis() - lastWakeUpTime) > WAKE_UP_COMPLETE_TIME;
     }
 
 
-    public boolean hasReachFLowLimit(){
+    public boolean slowStartup(){
 
         long now = System.currentTimeMillis();
         if(now - this.lastWakeUpTime>=WAKE_UP_COMPLETE_TIME){
@@ -235,7 +217,6 @@ public class HostProfile implements HostInstance {
 
         }
 
-        //flowCount.decrementAndGet();
         return flowCount.incrementAndGet() >= bucketSize;
     }
 

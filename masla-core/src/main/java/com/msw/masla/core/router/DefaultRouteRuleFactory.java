@@ -11,6 +11,7 @@ import lombok.Data;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Author: Gavin.peng
@@ -19,6 +20,8 @@ import java.util.List;
  */
 @Data
 public class DefaultRouteRuleFactory {
+
+    public static final String FLUSH_CONFIG_KEY = "flushGlobalConfig";
 
     private MaslaRouteRuleProperties maslaRouteRuleProperties;
 
@@ -53,7 +56,8 @@ public class DefaultRouteRuleFactory {
     }
 
     public void loadRouteRule() throws Exception {
-        Collection<RouteRule> routeRules = routeRuleParse.parseRouteRule(nacosRouteConfig.getRouteProperties());
+        Properties newProperties = nacosRouteConfig.getRouteProperties();
+        Collection<RouteRule> routeRules = routeRuleParse.parseRouteRule(newProperties);
         this.routeRuleCache.refreshApiCache(routeRules);
     }
 

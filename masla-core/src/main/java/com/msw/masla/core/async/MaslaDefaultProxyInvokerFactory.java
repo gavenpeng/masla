@@ -3,7 +3,7 @@ package com.msw.masla.core.async;
 import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.core.async.repsone.MaslaHttpDecode;
 import com.msw.masla.core.async.pool.MaslaPushExecutors;
-import com.msw.masla.core.discovery.healthcheck.HealthcheckManager;
+import com.msw.masla.core.discovery.healthcheck.ServiceHealthcheckManager;
 import com.msw.masla.core.discovery.nacos.MaslaNacosDiscoveryProperties;
 import com.msw.masla.core.discovery.nacos.MaslaNacosServiceDiscovery;
 import com.msw.masla.core.discovery.nacos.MaslaNacosServiceManager;
@@ -130,8 +130,9 @@ public class MaslaDefaultProxyInvokerFactory implements DisposableBean {
 		routeRuleFactory.intRouteRuleFile(nacosServiceDiscovery);
 
 		//register healthcheck
-		HealthcheckManager.getInstance().registerMaslaNacosServiceDiscovery(nacosServiceDiscovery);
-
+		ServiceHealthcheckManager.getInstance().registerMaslaNacosServiceDiscovery(nacosServiceDiscovery);
+		ServiceHealthcheckManager.getInstance().registerMaslaSeverConfig(maslaServerConfig);
+		ServiceHealthcheckManager.getInstance().startDoHealthcheck();
 
 	}
 

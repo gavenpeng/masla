@@ -7,7 +7,7 @@ import com.msw.masla.common.util.CollectionUtil;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.core.async.context.MaslaRequestContextBuilder;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.MaslaDefaultFilterChain;
 import com.msw.masla.filter.frame.MaslaFilter;
@@ -71,7 +71,7 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
         //the app's health check
         if (session.getContextRoot().equals(Constants.MASLA_HEALTHCHECK_PATH_END)
                 || session.getPath().equals(Constants.MASLA_HEALTHCHECK_PATH_END)) {
-            HttpResponse response = NettyCommonUtil.createResponse(HttpResponseStatus.OK,"Malsa healthcheck status is ok!!!");
+            HttpResponse response = MaslaHttpUtil.createResponse(HttpResponseStatus.OK,"Malsa healthcheck status is ok!!!");
             session.writeAndFlush(response);
             reqContext.getEvent().recycle();
             reqContext.recycle();
@@ -126,6 +126,7 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
 
         MaslaDefaultFilterChain filterChain = new MaslaDefaultFilterChain(matcherFilter.toArray(new MaslaFilter[0]), servlet);
         reqContext.setRequestPath(requestPath);
+
         reqContext.getSession().addKeepaliveRequest();
         try {
             filterChain.doFilter(reqContext, reqContext.getEvent());

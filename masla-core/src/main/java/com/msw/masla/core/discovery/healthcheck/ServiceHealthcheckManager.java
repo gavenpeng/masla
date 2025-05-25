@@ -1,5 +1,6 @@
 package com.msw.masla.core.discovery.healthcheck;
 
+import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.enums.HostStatus;
 import com.msw.masla.common.pojo.ServiceApp;
@@ -14,10 +15,8 @@ import com.msw.masla.protocol.http.netty.http.HostInstance;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -27,11 +26,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
- * Created by Gavin.peng on 2017/6/22.
+ * Created by Gavin.peng on 2023/8/22.
  */
-public class HealthcheckManager {
+public class ServiceHealthcheckManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HealthcheckManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceHealthcheckManager.class);
 
     private static final String METHOD_GET = "GET" ;
 
@@ -54,16 +53,22 @@ public class HealthcheckManager {
 
     private MaslaNacosServiceDiscovery maslaNacosServiceDiscovery;
 
+    private MaslaServerConfig maslaServerConfig;
+
 
     static class HealthcheckManagerHolder {
-        public static HealthcheckManager instance = new HealthcheckManager();
+        public static ServiceHealthcheckManager instance = new ServiceHealthcheckManager();
     }
 
-    public static HealthcheckManager getInstance(){
+    public static ServiceHealthcheckManager getInstance(){
         return HealthcheckManagerHolder.instance;
     }
 
-    private HealthcheckManager(){
+    private ServiceHealthcheckManager(){
+
+    }
+
+    public void startDoHealthcheck() {
         if(!isHealthCheckDisabled()){
             timer.schedule(new TurnOffTask(), STATUS_TURN_OFF_DELAY, STATUS_TURN_OFF_INTERVAL);
         }
@@ -73,16 +78,12 @@ public class HealthcheckManager {
         this.maslaNacosServiceDiscovery = maslaNacosServiceDiscovery;
     }
 
+    public void registerMaslaSeverConfig(MaslaServerConfig maslaServerConfig) {
+        this.maslaServerConfig = maslaServerConfig;
+    }
+
     private boolean isHealthCheckDisabled(){
-        boolean disabled = false;
-        try {
-            Properties properties = PropertiesLoaderUtils.loadAllProperties("masla.properties");
-            String config = properties.getProperty("Masla.health.check.disable", "false");
-            disabled = Boolean.parseBoolean(config);
-        } catch (IOException e) {
-           LOG.error("error to load health check disable property ",e);
-        }
-        return  disabled;
+        return maslaServerConfig.isServiceHealthcheckDisabled();
     }
 
     public void addHostProfileNEW(ServiceApp appDO, HostProfile hostProfile){

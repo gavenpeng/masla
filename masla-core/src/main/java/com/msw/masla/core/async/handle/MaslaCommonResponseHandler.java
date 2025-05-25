@@ -5,16 +5,15 @@ import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.event.EventState;
-import com.msw.masla.core.push.processor.impl.CircuitBreakNettyResponseProcessor;
+import com.msw.masla.core.push.processor.impl.CircuitBreakResponseProcessor;
 import com.msw.masla.core.push.processor.impl.HttpContentCompressService;
 import com.msw.masla.protocol.http.netty.session.IOSession;
-import com.msw.masla.core.utils.MaslaBackupResponseUitls;
 import com.msw.masla.protocol.http.netty.exception.MaslaException;
 import com.msw.masla.protocol.http.netty.exception.NoAvailableHostException;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.common.enums.RequestDispatchMode;
-import com.msw.masla.core.push.processor.impl.ApiMetricNettyResponseProcessor;
+import com.msw.masla.core.push.processor.impl.ApiMetricResponseProcessor;
 import com.msw.masla.core.push.processor.ResponseParameterProcessor;
 import com.msw.masla.core.push.processor.ResponseProcessor;
 import io.netty.handler.codec.http.*;
@@ -38,8 +37,8 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
         prevProcessesList = new ArrayList<ResponseProcessor>(2);
         postProcessesList = new ArrayList<ResponseProcessor>(5);
         prevProcessesList.add(new ResponseParameterProcessor());
-        postProcessesList.add(new ApiMetricNettyResponseProcessor());
-        postProcessesList.add(new CircuitBreakNettyResponseProcessor());
+        postProcessesList.add(new ApiMetricResponseProcessor());
+        postProcessesList.add(new CircuitBreakResponseProcessor());
     }
 
     static class MaslaResponseHandlerHolder{
@@ -102,7 +101,7 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
         }catch (Throwable e){
             LOG.error("Masla do push request {} response error {}",requestContext.getRequestUrl(),e.getMessage());
             event.setState(EventState.PUSH_FAILED);
-            requestContext.getSession().writeAndFlush(NettyCommonUtil.createResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR,"intranet request url execute failed   -API Gateway"));
+            requestContext.getSession().writeAndFlush(MaslaHttpUtil.createResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR,"intranet request url execute failed   -API Gateway"));
             throw e;
         }finally {
 
@@ -178,8 +177,6 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
 
         try {
 
-            String serviceId = NettyCommonUtil.getServiceId(requestContext);
-            httpResponse = MaslaBackupResponseUitls.fillBackupResponse(requestContext, serviceId);
 
             Throwable cause = event.getErrorCause();
             if (Constants.WAIT_TIMEOUT_EXCEPTION
@@ -209,21 +206,16 @@ public class MaslaCommonResponseHandler extends AbstractHandler<FullHttpResponse
                 }
             }
 
-            if (httpResponse == null) {
-                //TODO 响应异常到前端
-                String errorContent = headerFlag;
-                requestContext.getSession().setError();
-                if (event.getErrorCause() instanceof TimeoutException) {
-                    httpResponse = NettyCommonUtil.createResponse(NettyCommonUtil.TIMEOUT_REQUESTS, errorContent, headerFlag);
-                } else {
-                    httpResponse = NettyCommonUtil.createResponse(NettyCommonUtil.REQUEST_FAILED, errorContent, headerFlag);
-                }
+            httpResponse = MaslaHttpUtil.createResponse(HttpResponseStatus.OK, headerFlag);
+            String errorContent = headerFlag;
+            requestContext.getSession().setError();
+            if (event.getErrorCause() instanceof TimeoutException) {
+                httpResponse = MaslaHttpUtil.createResponse(MaslaHttpUtil.TIMEOUT_REQUESTS, errorContent, headerFlag);
             } else {
-                //增加网关返回头
-                httpResponse.headers().add(Constants.MASLA_RESPONSE_HEADER_KEY, headerFlag);
+                httpResponse = MaslaHttpUtil.createResponse(MaslaHttpUtil.REQUEST_FAILED, errorContent, headerFlag);
             }
 
-        }catch (Throwable e){
+        } catch (Throwable e){
             LOG.error("Masla set failed request {} header error:",requestContext.getRequestUrl(),e);
         }
 

@@ -6,7 +6,7 @@ import com.msw.masla.core.router.rule.RouteRule;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.protocol.http.netty.codec.MaslaChannelAttribute;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.Attribute;
@@ -125,7 +125,7 @@ public class MaslaAsyncContext implements SessionContext<IOSession ,HttpRequest 
             return event.getResult();
         }
         if(httpResponse == null){
-            this.httpResponse = NettyCommonUtil.createResponse(HttpResponseStatus.OK,"");
+            this.httpResponse = MaslaHttpUtil.createResponse(HttpResponseStatus.OK,"");
         }
         return httpResponse;
     }
@@ -363,7 +363,7 @@ public class MaslaAsyncContext implements SessionContext<IOSession ,HttpRequest 
 
     @Override
     public void fillCookies() {
-        Map<String, String> cookies = NettyCommonUtil.getCookieMap(this.httpRequest);
+        Map<String, String> cookies = MaslaHttpUtil.getCookieMap(this.httpRequest);
         this.setCookie(cookies);
     }
 

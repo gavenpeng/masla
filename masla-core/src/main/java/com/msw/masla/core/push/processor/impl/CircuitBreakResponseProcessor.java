@@ -16,7 +16,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 /**
  * Created by Gavin.peng on 2023/9/6.
  */
-public class CircuitBreakNettyResponseProcessor extends MaslaBodyResponseProcessor<FullHttpResponse> {
+public class CircuitBreakResponseProcessor extends MaslaBodyResponseProcessor<FullHttpResponse> {
 
     private static final String PROCESSOR_NAME = "CircuitBreakProcessor";
 

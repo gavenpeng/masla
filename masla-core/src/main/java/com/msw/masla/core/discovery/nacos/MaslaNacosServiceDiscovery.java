@@ -10,6 +10,7 @@ import com.msw.masla.protocol.http.netty.http.HostInstance;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,15 +126,44 @@ public class MaslaNacosServiceDiscovery {
 
         List<HostInstance> results = new ArrayList<>(instances.size());
         List<HostInstance> tagHosts = new ArrayList<>(instances.size());
+        List<HostInstance> removeHosts = new ArrayList<>(instances.size());
+        List<HostInstance> newHosts = new ArrayList<>(instances.size());
+
+        Map<String, HostInstance> currentInstanceMap = new HashMap<>();
+
         for (Instance instance : instances) {
             HostInstance hostInstance = instanceToHostProfile(instance, serviceId);
             String tag = hostInstance.getMetadata().get(Constants.MASLA_ROUTE_TAG);
+            String key = hostInstance.getHost() + ":" + hostInstance.getPort();
+            currentInstanceMap.put(key, hostInstance);
             if (StringUtil.isEmptyString(tag)) {
                 results.add(hostInstance);
             } else {
                 tagHosts.add(hostInstance);
             }
         }
+
+        // 获取旧实例列表并构造旧的 key 集合
+        List<HostInstance> oldList = stableInstancesMap.getOrDefault(serviceId, Collections.emptyList());
+        Map<String, HostInstance> oldInstanceMap = new HashMap<>();
+        for (HostInstance old : oldList) {
+            String key = old.getHost() + ":" + old.getPort();
+            oldInstanceMap.put(key, old);
+        }
+
+        for (String key : currentInstanceMap.keySet()) {
+            if (!oldInstanceMap.containsKey(key)) {
+                newHosts.add(currentInstanceMap.get(key));
+            }
+        }
+
+        for (String key : oldInstanceMap.keySet()) {
+            if (!currentInstanceMap.containsKey(key)) {
+                removeHosts.add(oldInstanceMap.get(key));
+            }
+        }
+
+
         if (!results.isEmpty()) {
             stableInstancesMap.put(serviceId, results);
         }
@@ -141,6 +171,8 @@ public class MaslaNacosServiceDiscovery {
             tagInstancesMap.put(serviceId, tagHosts);
         }
 
+        log.info("Masla found nacos new add instances: {}", newHosts);
+        log.info("Masla found nacos delete instances: {}", removeHosts);
 
     }
 
@@ -162,7 +194,6 @@ public class MaslaNacosServiceDiscovery {
         }
         metadata.put("nacos.ephemeral", String.valueOf(instance.isEphemeral()));
         hostProfile.setMetadata(metadata);
-
 
         return hostProfile;
     }

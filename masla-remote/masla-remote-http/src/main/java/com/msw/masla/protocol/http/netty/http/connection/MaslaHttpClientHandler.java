@@ -64,7 +64,7 @@ public class MaslaHttpClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if(!ctx.channel().closeFuture().isDone()) {
-            disalbeMultiplexAndClose(ctx.channel());
+            closeChannel(ctx.channel());
         }
         //LOG.info("Found channel local {} is receive FIN request",ctx.channel().remoteAddress());
         SessionContext maslaContext = ctx.channel().attr(SessionContext.CONTEXT_KEY).get();
@@ -81,7 +81,7 @@ public class MaslaHttpClientHandler extends ChannelInboundHandlerAdapter {
             //如果发生读空闲，而且连接在用，说明超时,需要关闭连接
             if(((IdleStateEvent) evt).state() == IdleState.READER_IDLE){
                 if(!ctx.channel().closeFuture().isDone()) {
-                    disalbeMultiplexAndClose(ctx.channel());
+                    closeChannel(ctx.channel());
                 }else{
                     LOG.info("Masla found channel {} is idle but already close",ctx.channel().remoteAddress());
                 }
@@ -106,19 +106,17 @@ public class MaslaHttpClientHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
         LOG.error("Receive exception event from channel {} exception:",ctx.channel().remoteAddress(),cause);
-        disalbeMultiplexAndClose(ctx.channel());
+        closeChannel(ctx.channel());
         maslaDecode.receiveException(ctx.channel(), cause);
 
     }
 
 
-    private void disalbeMultiplexAndClose(Channel channel){
-        LOG.info("Masla found channel {} is idle timeout,available disable multiplex!!!",channel.remoteAddress());
+    private void closeChannel(Channel channel){
         try {
             channel.close();
-
         }catch (Exception e){
-            LOG.error("Masla disable channel {} multiplex status and close failed:{}",channel.remoteAddress(),e.getMessage());
+            LOG.error("Masla close channel {} failed:{}",channel.remoteAddress(),e.getMessage());
         }
     }
 

@@ -7,7 +7,7 @@ import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.pojo.ServiceApp;
 import com.msw.masla.common.util.StringBuilderHolder;
 import com.msw.masla.core.utils.MaslaBackupResponseUitls;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
@@ -45,28 +45,26 @@ public class CircuitFilter extends AbstractMaslaFilter {
   @Override
   public boolean apply(SessionContext<IOSession, HttpRequest, HttpResponse> context, BaseEvent event) throws FilterException {
 
-    try {
-      ServiceApp appDO = context.getService();
-      String serviceId = context.getServiceIdentify();
-      //获取熔断配置
-      StringBuilder stringBuilder = StringBuilderHolder.getGlobal();
-      stringBuilder.append(appDO.getContextRoot()).append(serviceId);
-      String appServiceId = stringBuilder.toString();
-      MaslaCircuitBreakerImpl circuitBreaker = (MaslaCircuitBreakerImpl) CircuitFactory.getCircuitBreaker(appDO);
-      //检查是否有熔断配置
-      if (circuitBreaker != null && allowCheckCircuit(context, circuitBreaker.getApiCircuitDO())
-              && circuitBreaker.doCircuit()) {
-        appDO.addServiceCircuitCount(serviceId);
-        doClosure(context, appServiceId, circuitBreaker.getApiCircuitDO());
-        return true;
+      try {
+          ServiceApp serviceApp = context.getService();
+          String serviceId = context.getServiceIdentify();
+          //获取熔断配置
+          StringBuilder stringBuilder = StringBuilderHolder.getGlobal();
+          stringBuilder.append(serviceApp.getContextRoot()).append(serviceId);
+          String appServiceId = stringBuilder.toString();
+          MaslaCircuitBreakerImpl circuitBreaker = (MaslaCircuitBreakerImpl) CircuitFactory.getCircuitBreaker(serviceApp);
+          //检查是否有熔断配置
+          if (circuitBreaker != null && allowCheckCircuit(context, circuitBreaker.getApiCircuitDO())
+                  && circuitBreaker.doCircuit()) {
+              serviceApp.addServiceCircuitCount(serviceId);
+              doClosure(context, appServiceId, circuitBreaker.getApiCircuitDO());
+              return false;
+          }
+      } catch (Throwable e){
+          LOG.error("Masla gateway do circuit filter failed:",e);
       }
-    }catch (Throwable e){
-      LOG.error("Masla gateway do circuit filter failed:",e);
-    }
 
-
-    return false;
-
+      return true;
 
   }
 
@@ -93,21 +91,18 @@ public class CircuitFilter extends AbstractMaslaFilter {
     context.getSession().setError();
     try {
 
-      HttpResponseStatus circuitResponseCode = NettyCommonUtil.CIRCUIT_REQUESTS;
-      if (apiCircuitDO != null) {
-        HttpResponse httpResponse = MaslaBackupResponseUitls.fillBackupResponse(context,serviceId);
-        if (httpResponse != null){
-          httpResponse.headers().set(Constants.MASLA_RESPONSE_HEADER_KEY,Constants.MASLA_RESPONSE_HEADER_CIRCUIT);
-          context.getSession().writeAndFlush(httpResponse);
+        HttpResponseStatus circuitResponseCode = MaslaHttpUtil.CIRCUIT_REQUESTS;
+        if (apiCircuitDO != null) {
+            HttpResponse httpResponse = MaslaHttpUtil.createResponse(MaslaHttpUtil.CIRCUIT_REQUESTS, Constants.MASLA_RESPONSE_HEADER_CIRCUIT);
+            httpResponse.headers().set(Constants.MASLA_RESPONSE_HEADER_KEY,Constants.MASLA_RESPONSE_HEADER_CIRCUIT);
+            context.getSession().writeAndFlush(httpResponse);
+
         } else {
-          context.getSession().writeError(circuitResponseCode, Constants.MASLA_RESPONSE_HEADER_CIRCUIT,true);
+            context.getSession().writeError(circuitResponseCode,Constants.MASLA_RESPONSE_HEADER_CIRCUIT, true);
         }
-      } else {
-        context.getSession().writeError(circuitResponseCode,Constants.MASLA_RESPONSE_HEADER_CIRCUIT, true);
-      }
     } finally {
-      context.getEvent().recycle();
-      context.recycle();
+        context.getEvent().recycle();
+        context.recycle();
     }
 
 

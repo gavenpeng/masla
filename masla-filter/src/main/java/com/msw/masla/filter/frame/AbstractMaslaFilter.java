@@ -1,6 +1,6 @@
 package com.msw.masla.filter.frame;
 
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
@@ -27,7 +27,7 @@ public abstract class AbstractMaslaFilter implements MaslaFilter{
     public void doFilter(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext, BaseEvent event,
                          MaslaFilterChain filterChain) throws FilterException {
 
-        if (NettyCommonUtil.isMaslaMetaPath(requestContext)) {
+        if (MaslaHttpUtil.isMaslaMetaPath(requestContext)) {
             filterChain.doFilter(requestContext, event);
             return;
         }

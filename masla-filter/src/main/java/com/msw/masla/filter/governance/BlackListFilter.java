@@ -6,7 +6,7 @@ import com.msw.masla.common.monitor.metrics.AppRequestFailedCount;
 import com.msw.masla.core.async.context.MaslaAsyncContext;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.core.router.rule.RouteRule;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
@@ -17,8 +17,6 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.msw.masla.core.utils.MaslaBackupResponseUitls.fillBackupResponse;
 
 /**
  * 黑名单过滤器
@@ -89,15 +87,13 @@ public class BlackListFilter extends AbstractMaslaFilter {
   private void returnForbiddenResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
 
     try {
-      String appServiceId = NettyCommonUtil.getServiceId(requestContext);
-      HttpResponse httpResponse = fillBackupResponse(requestContext,appServiceId);
-      if (httpResponse == null) {
-        httpResponse = NettyCommonUtil
-            .createResponse(HttpResponseStatus.FORBIDDEN, "request forbidden",
+
+      HttpResponse  httpResponse = MaslaHttpUtil
+            .createResponse(HttpResponseStatus.FORBIDDEN, "Request Forbidden",
                 Constants.MASLA_RESPONSE_HEADER_APPLICATION_BLACK);
-      }
       requestContext.getSession().writeAndClose(httpResponse);
-    }finally {
+
+    } finally {
       requestContext.getEvent().recycle();
       requestContext.recycle();
     }

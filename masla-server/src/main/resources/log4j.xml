@@ -8,9 +8,9 @@
         </layout>
     </appender>
 
-    <category name="com.msw.masla.protocol.http.netty">
-        <priority value="debug"/>
-    </category>
+<!--    <category name="com.msw.masla.protocol.http.netty">-->
+<!--        <priority value="debug"/>-->
+<!--    </category>-->
 
     <!-- 根logger的设置-->
     <root>

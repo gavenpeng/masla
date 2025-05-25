@@ -12,9 +12,7 @@ import com.msw.masla.core.log.RequestSampler;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.protocol.http.netty.exception.MaslaException;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
-import com.msw.masla.core.utils.NettyCommonUtil;
 
-import com.msw.masla.common.enums.ErrorType;
 import com.msw.masla.common.enums.RequestDispatchMode;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;

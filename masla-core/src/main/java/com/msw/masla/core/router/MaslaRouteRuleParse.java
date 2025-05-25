@@ -3,6 +3,7 @@ package com.msw.masla.core.router;
 import com.msw.masla.common.util.StringUtil;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.core.router.rule.RouteRule;
+import com.msw.masla.core.router.rule.RouteRuleCache;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
@@ -13,6 +14,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.msw.masla.core.router.MaslaRouteRuleProperties.GATEWAY_GLOBAL_FILTER_NAME;
+
 
 /**
  * Author: Gavin.peng
@@ -30,7 +34,6 @@ public class MaslaRouteRuleParse implements RouteRuleParse {
 
 
     private Collection<RouteRule> doParseRouteRule(Properties properties){
-
         Map<String, RouteRule> routeRuleMap = new HashMap<>();
         Set<String> keys = properties.stringPropertyNames();
         keys.stream()
@@ -70,11 +73,13 @@ public class MaslaRouteRuleParse implements RouteRuleParse {
                                 routeRule.setTimeout(Long.parseLong(timeout));
                             }
 
-                            parseServiceFilterConfig(serviceName, properties, routeRule);
+                            parseServiceFilterConfig(serviceName, properties, routeRule, false);
                             routeRuleMap.put(serviceName, routeRule);
                         }
                     }
                 });
+
+        parseServiceFilterConfig(GATEWAY_GLOBAL_FILTER_NAME, properties, null, true);
 
         return routeRuleMap.values();
     }
@@ -88,18 +93,23 @@ public class MaslaRouteRuleParse implements RouteRuleParse {
 
     }
 
-    private void parseServiceFilterConfig(String serviceName, Properties properties, RouteRule routeRule) {
+    private void parseServiceFilterConfig(String serviceName, Properties properties, RouteRule routeRule, boolean global) {
         Set<String> keys = properties.stringPropertyNames();
         AtomicReference<String> filterStrategyName = new AtomicReference<>();
         AtomicReference<FlowSelectorRule> flowSelectorRule = new AtomicReference<>();
-        String serviceFilterPrefix = MaslaRouteRuleProperties.GATEWAY_ROUTE_SERVICE_PREFIX + serviceName + ".filter.";
+        String filterPrefix = global? MaslaRouteRuleProperties.GATEWAY_ROUTE_PREFIX : MaslaRouteRuleProperties.GATEWAY_ROUTE_SERVICE_PREFIX;
+        final String serviceFilterPrefix = filterPrefix + serviceName + ".filter.";
         keys.stream()
                 .filter(strategy -> strategy.startsWith(serviceFilterPrefix))
                 .forEach(strategy -> {
                     if (flowSelectorRule.get() == null) {
                         flowSelectorRule.set(new FlowSelectorRule());
                         String filterName = extractFilterValueKey(strategy, serviceFilterPrefix);
-                        log.info("Masla init service {} filter {} config", serviceName, filterName);
+                        if (!global) {
+                            log.info("Masla init service {} filter {} config", serviceName, filterName);
+                        } else {
+                            log.info("Masla init {} filter {} config", serviceName, filterName);
+                        }
                         filterStrategyName.set(filterName);
                     }
 
@@ -130,44 +140,11 @@ public class MaslaRouteRuleParse implements RouteRuleParse {
 
                 });
 
-        if (flowSelectorRule.get() != null) {
+        if (flowSelectorRule.get() != null && !global) {
             routeRule.getStrategy().put(filterStrategyName.get(), flowSelectorRule.get());
+        } else if (global) {
+            RouteRuleCache.addGlobalFilter(filterStrategyName.get(), flowSelectorRule.get());
         }
-
-    }
-
-
-    private void parseGlobalFilter(Properties properties) {
-        String globalFilterPrefix = MaslaRouteRuleProperties.GATEWAY_ROUTE_PREFIX + ".filter.";
-//        keys.stream()
-//                .filter(filter -> filter.startsWith(globalFilterPrefix))
-//                .forEach(filter -> {
-//
-//                    FlowSelectorRule flowSelectorRule = new FlowSelectorRule();
-//                    String path = properties.getProperty(globalFilterPrefix + ".path");
-//                    if (!StringUtil.isEmptyString(path)) {
-//                        flowSelectorRule.setPath(path);
-//                    }
-//
-//                    String ip = properties.getProperty(globalFilterPrefix + ".ip");
-//                    if (!StringUtil.isEmptyString(ip)) {
-//                        flowSelectorRule.setIp(ip);
-//                    }
-//
-//                    String headerKey = properties.getProperty(globalFilterPrefix + ".header.key");
-//                    if (!StringUtil.isEmptyString(headerKey)) {
-//                        flowSelectorRule.setHeaderKey(headerKey);
-//
-//                    }
-//
-//                    String headerValue = properties.getProperty(globalFilterPrefix + ".header.value");
-//                    if (!StringUtil.isEmptyString(headerValue)) {
-//                        flowSelectorRule.setHeaderKeyValue(headerValue);
-//                    }
-//
-//                    RouteRuleCache.addGlobalFilter(filter, flowSelectorRule);
-//
-//                });
 
     }
 

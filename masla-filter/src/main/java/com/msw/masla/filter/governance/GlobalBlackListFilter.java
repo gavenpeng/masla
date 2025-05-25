@@ -3,7 +3,7 @@ package com.msw.masla.filter.governance;
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.core.router.rule.RouteRuleCache;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
@@ -14,7 +14,6 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.msw.masla.core.utils.MaslaBackupResponseUitls.fillBackupResponse;
 
 /**
  * Author: Gavin.peng
@@ -43,7 +42,6 @@ public class GlobalBlackListFilter extends AbstractMaslaFilter {
             if (forbidden) {
                 log.info("request {} is  match the black list of , forbidden it.",
                         requestContext.getRequestUrl());
-
                 returnForbiddenResponse(requestContext);
                 return false;
             }
@@ -64,13 +62,10 @@ public class GlobalBlackListFilter extends AbstractMaslaFilter {
     private void returnForbiddenResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
 
         try {
-            String appServiceId = NettyCommonUtil.getServiceId(requestContext);
-            HttpResponse httpResponse = fillBackupResponse(requestContext,appServiceId);
-            if (httpResponse == null) {
-                httpResponse = NettyCommonUtil
-                        .createResponse(HttpResponseStatus.FORBIDDEN, "request forbidden",
+            HttpResponse httpResponse = MaslaHttpUtil
+                        .createResponse(HttpResponseStatus.FORBIDDEN, "Request Forbidden",
                                 Constants.MASLA_RESPONSE_HEADER_GLOBAL_BLACK);
-            }
+
             requestContext.getSession().writeAndClose(httpResponse);
         }finally {
             requestContext.getEvent().recycle();

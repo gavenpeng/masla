@@ -3,7 +3,7 @@ package com.msw.masla.server;
 import com.msw.masla.common.config.MaslaConfConfig;
 import com.msw.masla.common.config.MaslaServerConfig;
 import com.msw.masla.common.util.MaslaSpringContextUtil;
-import com.msw.masla.core.discovery.healthcheck.HealthcheckManager;
+import com.msw.masla.core.discovery.healthcheck.ServiceHealthcheckManager;
 import com.msw.masla.metrics.frame.AsyncAppAgregateAdminReporter;
 import com.msw.masla.metrics.frame.Reporter;
 import com.msw.masla.protocol.http.netty.factory.EventLoopFactory;
@@ -92,7 +92,7 @@ public class MaslaServer {
 
     public void addShutdownHook() {
         final MaslaServer nioServer = MaslaServer.getInstance();
-        final HealthcheckManager healthcheckManager = HealthcheckManager.getInstance();
+        final ServiceHealthcheckManager healthcheckManager = ServiceHealthcheckManager.getInstance();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {

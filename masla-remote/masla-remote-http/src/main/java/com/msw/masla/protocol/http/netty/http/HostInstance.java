@@ -34,10 +34,6 @@ public interface HostInstance {
      */
     Map<String, String> getMetadata();
 
-
-
-
-
     /**
      * @return The scheme of the service instance.
      */

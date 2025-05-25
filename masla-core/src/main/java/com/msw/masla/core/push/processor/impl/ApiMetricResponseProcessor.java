@@ -14,7 +14,7 @@ import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import com.msw.masla.metrics.http.DomainMetrics;
 import com.msw.masla.protocol.http.netty.exception.ServerClosedChannelException;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 
 
 import com.msw.masla.common.enums.SessionType;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Created by Gavin.peng on 2024/5/10.
  */
-public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProcessor {
+public class ApiMetricResponseProcessor extends AbstractHeaderResponseProcessor {
 
 
     private static final String PROCESSOR_NAME = "ApiMetricProcessor";
@@ -202,7 +202,7 @@ public class ApiMetricNettyResponseProcessor extends AbstractHeaderResponseProce
                 sessionType = SessionType.HTTPS2.ordinal();
             }
 
-            String realIp = NettyCommonUtil.getClientRealIp(requestContext.getHttpRequest(), requestContext.getSession().getChannel());
+            String realIp = MaslaHttpUtil.getClientRealIp(requestContext.getHttpRequest(), requestContext.getSession().getChannel());
 
             Map<String,String> extendHeaderMap = MaslaSpringContextUtil.getMaslaConfConfigBean().getDomainExtendHeaderMap();
             List<String> hitExtendHeaderList = new ArrayList<String>(extendHeaderMap.size());

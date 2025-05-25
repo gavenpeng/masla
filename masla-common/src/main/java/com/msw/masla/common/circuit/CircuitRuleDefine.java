@@ -19,7 +19,7 @@ public class CircuitRuleDefine {
 
     private static final String AUTO_UPGRADE_OR_DOWN_OPEN = "on";
 
-    private final long DEFAULT_SLEEP_WINDOW_TIME = 5000l;
+    private final long DEFAULT_SLEEP_WINDOW_TIME = 5000L;
 
     private Long id;
 
@@ -34,16 +34,20 @@ public class CircuitRuleDefine {
 
     private Integer circuit;
 
-    private Integer status;//0 禁用，1 启用
+    private Integer status;
 
-    private Integer circuitThreshold;//熔断阀值
-    private Long circuitAttendWindow;//完全熔断后自动探测时间窗口
-    private Integer upgradeOrDown;//是否做自动升降级
-    private Float circuitTriggerPercent;//自动触发熔断的异常比例
-    private Long circuitTriggerMinute;//触发熔断的单位时间
-    private Long circuitExpireMinute;//熔断的有效期，过该时间自动取消熔断
+    private Integer circuitThreshold;
 
-    //自定义响应参数
+    private Long circuitAttendWindow;
+
+    private Integer upgradeOrDown;
+
+    private Float circuitTriggerPercent;
+
+    private Integer circuitTriggerSecond;
+
+    private Long circuitExpireMinute;
+
     private String customizedResponseParams;
 
     /**
@@ -58,11 +62,15 @@ public class CircuitRuleDefine {
 
     private Date gmtModify;
 
+
     private boolean allDisalbed;
+
 
     private boolean doDisalbed;
 
+
     private boolean autoDiscardOff;
+
 
     private String circuitApiUrl;
 
@@ -87,7 +95,7 @@ public class CircuitRuleDefine {
 
         this.circuitTriggerPercent = circuitTriggerPercent;
         //默认30秒检查一次
-        this.circuitTriggerMinute = 30000L;
+        this.circuitTriggerSecond =  MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitTriggerSecond();
         this.circuitThreshold = MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitOpenMinRequestThreshold();
         this.upgradeOrDown = AUTO_UPGRADE_OR_DOWN_OPEN.equals(MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitAutoUpgradeOrDownSwitch())? 1 : 0;
         this.circuitAttendWindow = DEFAULT_SLEEP_WINDOW_TIME;
@@ -146,12 +154,12 @@ public class CircuitRuleDefine {
         this.circuitTriggerPercent = circuitTriggerPercent;
     }
 
-    public Long getCircuitTriggerMinute() {
-        return circuitTriggerMinute;
+    public Integer getCircuitTriggerSecond() {
+        return circuitTriggerSecond;
     }
 
-    public void setCircuitTriggerMinute(Long circuitTriggerMinute) {
-        this.circuitTriggerMinute = circuitTriggerMinute;
+    public void setCircuitTriggerSecond(Integer circuitTriggerSecond) {
+        this.circuitTriggerSecond = circuitTriggerSecond;
     }
 
     public Long getCircuitExpireMinute() {
@@ -341,7 +349,7 @@ public class CircuitRuleDefine {
             }
         }
         this.setCircuit(apiCircuitDO.getCircuit());
-        this.setCircuitTriggerMinute(apiCircuitDO.getCircuitTriggerMinute());
+        this.setCircuitTriggerSecond(apiCircuitDO.getCircuitTriggerSecond());
         this.setCircuitTriggerPercent(apiCircuitDO.getCircuitTriggerPercent());
         this.setCircuitExpireMinute(apiCircuitDO.getCircuitExpireMinute());
         this.setUpgradeOrDown(apiCircuitDO.getUpgradeOrDown());
@@ -353,8 +361,8 @@ public class CircuitRuleDefine {
     }
 
     public boolean isAutoMode(){
-        if(this.circuitTriggerMinute != null
-                && this.circuitTriggerMinute > 0
+        if(this.circuitTriggerSecond != null
+                && this.circuitTriggerSecond > 0
                 && this.circuitTriggerPercent != null
                 && this.circuitTriggerPercent > 0){
             return true;

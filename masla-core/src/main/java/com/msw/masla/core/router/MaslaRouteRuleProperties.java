@@ -20,6 +20,8 @@ public class MaslaRouteRuleProperties {
 
     public static final String GATEWAY_ROUTE_PREFIX = "masla.gateway.routes.";
 
+    public static final String GATEWAY_GLOBAL_FILTER_NAME = "global";
+
     public static final String GATEWAY_ROUTE_SERVICE_PREFIX = "masla.gateway.routes.service.";
 
     public static final String ROUTE_SERVICE_PATTERN_PREFIX = "masla.gateway.routes.service.pattern";

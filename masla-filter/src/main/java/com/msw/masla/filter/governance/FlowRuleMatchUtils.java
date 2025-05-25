@@ -1,5 +1,6 @@
 package com.msw.masla.filter.governance;
 
+import com.msw.masla.common.constant.Constants;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.session.IOSession;
@@ -18,13 +19,14 @@ public class FlowRuleMatchUtils {
                                          FlowSelectorRule flowSelectorRule) {
 
         if (!StringUtils.isEmpty(flowSelectorRule.getPath())) {
-            if (!requestContext.getServiceIdentify().equals(flowSelectorRule.getPath())) {
+            String reqPath = requestContext.getSession().getContextRoot() + requestContext.getServiceIdentify();
+            if (!reqPath.equals(flowSelectorRule.getPath())) {
                 return false;
             }
         }
 
         if (!StringUtils.isEmpty(flowSelectorRule.getIp())) {
-            String ip = requestContext.getHttpRequest().headers().get("CLIENT_IP");
+            String ip = requestContext.getHttpRequest().headers().get(Constants.CLIENT_REAL_IP);
             if (!ip.equals(flowSelectorRule.getIp())) {
                 return false;
             }

@@ -122,6 +122,9 @@ public class MaslaServerConfig {
     private String maslaCollectorServerAddress;
 
 
+    @NacosValue(value = "${masla.service.healthcheck.disabled:true}", autoRefreshed = true)
+    private boolean serviceHealthcheckDisabled;
+
     public void setPort(Integer port) {
         this.port = port;
     }

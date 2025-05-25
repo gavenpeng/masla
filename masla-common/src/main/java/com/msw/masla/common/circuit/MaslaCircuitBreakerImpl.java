@@ -109,7 +109,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
 
     private boolean isCircuitWindow() {
         final long currentTime = System.currentTimeMillis();
-        return currentTime > this.updateServerTimeoutCountTime + this.circuitRuleDefine.getCircuitTriggerMinute();
+        return currentTime > this.updateServerTimeoutCountTime + this.circuitRuleDefine.getCircuitTriggerSecond() * 1000;
     }
 
     @Override
@@ -209,7 +209,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
                             String curPercent = this.showPercent();
 //                            String sidName = this.circuitRuleDefine.getCircuitApiUrl() == null ? this.circuitRuleDefine.getAppName() : this.circuitRuleDefine.getCircuitApiUrl();
                             if(this.circuitRuleDefine.isDoDisalbed()) {
-                                LOG.warn("Masla found  in {} minute happened {} numbers failed in {} numbers error percent {} > {},so not down also circuit {}", this.circuitRuleDefine.getCircuitTriggerMinute() / (1000 * 60), timeOutNums, requestNums,errorPercent, circuitLowWaterMark, curPercent);
+                                LOG.warn("Masla found  in {} minute happened {} numbers failed in {} numbers error percent {} > {},so not down also circuit {}", this.circuitRuleDefine.getCircuitTriggerSecond() / 60, timeOutNums, requestNums,errorPercent, circuitLowWaterMark, curPercent);
                             }
                         }
                     }
@@ -239,7 +239,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
             return false;
         }
         long hostQpsThreshold = this.circuitRuleDefine.getCircuitThreshold() / clusterSize;
-        long seconds = this.circuitRuleDefine.getCircuitTriggerMinute() / 1000;
+        long seconds = this.circuitRuleDefine.getCircuitTriggerSecond();
         if (seconds <= 0) {
             seconds = 60;
         }
@@ -260,7 +260,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
         }
         String curPercent = this.showPercent();
         String sidName = this.circuitRuleDefine.getCircuitApiUrl()==null?this.circuitRuleDefine.getAppName():this.circuitRuleDefine.getCircuitApiUrl();
-        LOG.warn("Masla found api {} in {} seconds happened {} numbers timeout in {} numbers error percent {} < {},so do circuit continue down {}", sidName, this.circuitRuleDefine.getCircuitTriggerMinute() / 1000, timeOutNums,requestNums,errorPercent,upgradeThreshold,curPercent);
+        LOG.warn("Masla found api {} in {} seconds happened {} numbers timeout in {} numbers error percent {} < {},so do circuit continue down {}", sidName, this.circuitRuleDefine.getCircuitTriggerSecond(), timeOutNums,requestNums,errorPercent,upgradeThreshold,curPercent);
     }
 
 
@@ -282,7 +282,7 @@ public class MaslaCircuitBreakerImpl implements MaslaCircuitBreaker {
             }
         }
         String curPercent = this.showPercent();
-        LOG.warn("Masla found api {} in {} seconds happened {} numbers timeout total numbers {} error percent {} > {}%,so start circuit from {}", this.circuitRuleDefine.getCircuitApiUrl() == null?this.circuitRuleDefine.getAppName():this.circuitRuleDefine.getCircuitApiUrl(), this.circuitRuleDefine.getCircuitTriggerMinute() /1000, timeOutNums, requestNums,errorPercent, this.circuitRuleDefine.getCircuitTriggerPercent() * 100, curPercent);
+        LOG.warn("Masla found api {} in {} seconds happened {} numbers timeout total numbers {} error percent {} > {}%,so start circuit from {}", this.circuitRuleDefine.getCircuitApiUrl() == null?this.circuitRuleDefine.getAppName():this.circuitRuleDefine.getCircuitApiUrl(), this.circuitRuleDefine.getCircuitTriggerSecond(), timeOutNums, requestNums,errorPercent, this.circuitRuleDefine.getCircuitTriggerPercent() * 100, curPercent);
     }
 
     @Override

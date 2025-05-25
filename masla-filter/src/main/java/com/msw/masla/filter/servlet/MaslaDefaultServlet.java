@@ -2,7 +2,7 @@ package com.msw.masla.filter.servlet;
 
 import com.msw.masla.core.async.MaslaDefaultProxyInvokerFactory;
 import com.msw.masla.core.invoker.ProxyInvoker;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.protocol.http.netty.context.SessionContext;
 import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
@@ -38,7 +38,7 @@ public class MaslaDefaultServlet implements MaslaServlet {
             proxyInvoker.invoke(requestContext);
         } catch (Throwable e) {
             log.error("Masla servlet process request url {} exception:", requestContext.getRequestUrl(), e);
-            HttpResponse httpResponse = NettyCommonUtil.createResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Masla gateway process request url execute failed:" + e.getMessage());
+            HttpResponse httpResponse = MaslaHttpUtil.createResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Masla gateway process request url execute failed:" + e.getMessage());
             requestContext.getSession().writeAndFlush(httpResponse);
             requestContext.getEvent().recycle();
             requestContext.recycle();

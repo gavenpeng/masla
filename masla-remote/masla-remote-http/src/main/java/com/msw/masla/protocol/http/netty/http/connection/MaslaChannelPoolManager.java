@@ -31,19 +31,27 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by Gavin.peng on 2017/5/16.
+ * Created by Gavin.peng on 2023/08/16.
  */
 public class MaslaChannelPoolManager {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(MaslaChannelPoolManager.class);
+
     private EventLoopGroup ioGroup = null;
+
     private Bootstrap bootstrap;
+
     private Class<? extends SocketChannel> SocketChannel;
+
     private ConcurrentHashMap<HostInstance, MaslaChannelPool> poolMap;
-    private ConcurrentHashMap<String,HostInstance> hostMap;//used by copy
+
+    private ConcurrentHashMap<String,HostInstance> hostMap;
+
     private static final int LOW_WATER_MARK = 1024 * 8;
+
     private static final int HIGH_WATER_MARK = 1024 * 128;
+
     private int ioThreadCount = 10;
 
 
@@ -108,14 +116,14 @@ public class MaslaChannelPoolManager {
         this.poolMap.putIfAbsent(HostInstance,channelPool);
     }
 
-    public MaslaChannelPool getChannelPool(HostInstance HostInstance, ServiceApp appDO) throws Exception{
+    public MaslaChannelPool getChannelPool(HostInstance HostInstance, ServiceApp serviceApp) throws Exception{
         MaslaChannelPool fixedChannelPool = this.poolMap.get(HostInstance);
         if(fixedChannelPool != null)
             return fixedChannelPool;
         //new host need to create channel pool
         synchronized (poolMap) {
             if((fixedChannelPool = this.poolMap.get(HostInstance)) == null) {
-                fixedChannelPool = this.createChannelPool(HostInstance, appDO);
+                fixedChannelPool = this.createChannelPool(HostInstance, serviceApp);
                 this.addChannelPool(HostInstance,fixedChannelPool);
             }
         }

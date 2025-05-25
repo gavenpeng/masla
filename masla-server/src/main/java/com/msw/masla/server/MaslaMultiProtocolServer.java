@@ -9,7 +9,7 @@ import com.msw.masla.protocol.http.netty.config.CommonChannelConfigKeys;
 import com.msw.masla.protocol.http.netty.http.handler.MaslaReadIdleStateHandler;
 import com.msw.masla.protocol.http.netty.exception.MaslaException;
 import com.msw.masla.protocol.http.netty.factory.MaslaEventLoopGroupFactory;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.protocol.http.netty.util.BufferUtils;
 import com.msw.masla.server.handler.MaslaServerChannelHandler;
 import com.msw.masla.protocol.http.netty.http.handler.MaslaServerHttpRequestDecode;
@@ -274,6 +274,6 @@ public class MaslaMultiProtocolServer extends AbstractEndpoint {
     private void processTimeout(IOSession session){
         ReferenceCountUtil.release(session.getHttpRequest());
         session.setError();
-        session.writeError(NettyCommonUtil.TIMEOUT_REQUESTS,true);
+        session.writeError(MaslaHttpUtil.TIMEOUT_REQUESTS,true);
     }
 }

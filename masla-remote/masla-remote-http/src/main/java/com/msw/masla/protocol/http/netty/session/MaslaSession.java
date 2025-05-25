@@ -281,7 +281,7 @@ public class MaslaSession implements IOSession {
     @Override
     public void writeError(HttpResponseStatus httpResponseStatus,String headerFlag, final boolean close) {
         //this.prepareResponse();
-        if(close) {
+        if (close) {
             this.isError = true;
         }
         DefaultHttpResponse errorResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1,httpResponseStatus);

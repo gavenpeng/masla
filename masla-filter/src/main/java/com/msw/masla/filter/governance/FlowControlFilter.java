@@ -7,7 +7,7 @@ import com.msw.masla.core.router.DefaultRouteRuleFactory;
 import com.msw.masla.core.router.rule.FlowSelectorRule;
 import com.msw.masla.core.router.rule.RouteRule;
 import com.msw.masla.core.utils.MaslaBackupResponseUitls;
-import com.msw.masla.core.utils.NettyCommonUtil;
+import com.msw.masla.core.utils.MaslaHttpUtil;
 import com.msw.masla.filter.exception.FilterException;
 import com.msw.masla.filter.frame.AbstractMaslaFilter;
 import com.msw.masla.metrics.http.DomainMetrics;
@@ -16,6 +16,7 @@ import com.msw.masla.protocol.http.netty.event.BaseEvent;
 import com.msw.masla.protocol.http.netty.session.IOSession;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -75,12 +76,12 @@ public class FlowControlFilter extends AbstractMaslaFilter {
         requestContext.getService().addServiceFlowControllerCount(serviceId);
         DomainMetrics.addDomainFlowControllerCount(requestContext.getService().getName(), requestContext.getRouteHost(), requestContext.getRouteHost(),"local", 1);
         try{
-            HttpResponse httpResponse = MaslaBackupResponseUitls.fillBackupResponse(requestContext,appServiceId);
+            HttpResponse httpResponse = MaslaHttpUtil.createResponse(MaslaHttpUtil.FLOW_CONTROL_REQUESTS, Constants.MASLA_RESPONSE_HEADER_FLOW_CONTROLLER);
             if(httpResponse != null){
                 httpResponse.headers().set(Constants.MASLA_RESPONSE_HEADER_KEY,Constants.MASLA_RESPONSE_HEADER_FLOW_CONTROLLER);
                 requestContext.getSession().writeAndClose(httpResponse);
             }else {
-                requestContext.getSession().writeError(NettyCommonUtil.FLOW_CONTROL_REQUESTS, Constants.MASLA_RESPONSE_HEADER_FLOW_CONTROLLER,true);
+                requestContext.getSession().writeError(MaslaHttpUtil.FLOW_CONTROL_REQUESTS, Constants.MASLA_RESPONSE_HEADER_FLOW_CONTROLLER,true);
             }
         } finally {
             requestContext.getEvent().recycle();

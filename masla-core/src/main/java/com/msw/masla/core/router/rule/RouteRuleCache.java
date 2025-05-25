@@ -112,10 +112,7 @@ public class RouteRuleCache  {
                     addRouteRuleCommonPattern(routeRule, pattern);
                 } else {
                     //存在则更新
-                    RouteRule preRouteRule = getCacheRouteRuleFromCommon(routeRule, pattern);
-                    if (preRouteRule != null) {
-                        //preRouteRule.clone(routeRule);
-                    }
+                    updateCacheRouteRuleFromCommon(routeRule, pattern);
                 }
                 patternMap.put(routeRule.getPattern(), pattern);
             }
@@ -143,13 +140,12 @@ public class RouteRuleCache  {
         patternApiDOMap.put(pattern, routeRule);
     }
 
-    private RouteRule getCacheRouteRuleFromCommon(RouteRule routeRule, Pattern pattern){
+    private void updateCacheRouteRuleFromCommon(RouteRule routeRule, Pattern pattern){
         Map<Pattern, RouteRule> patternRouteRuleMap = APP_PATTERN_ROUTE_RULE_CACHE.get(routeRule.getAppName());
         if(patternRouteRuleMap != null) {
-            return patternRouteRuleMap.get(pattern);
-        }else{
-            return null;
+            patternRouteRuleMap.put(pattern, routeRule);
         }
+
     }
 
 
