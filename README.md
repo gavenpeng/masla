@@ -35,3 +35,31 @@ Global blacklist support.
 
 # Startup
 
+1. 执行 Maven 打包命令
+   在项目根目录下打开终端，执行以下命令：
+```
+mvn clean package
+```
+该命令会清理之前的构建文件，并重新编译和打包项目，生成可部署的压缩包 masla-0.0.1.tar.gz（文件名根据版本号可能不同）。
+
+2. 解压压缩包
+
+找到打包生成的压缩包文件 masla-0.0.1.tar.gz，执行如下命令解压：
+
+```
+tar -zxvf masla-0.0.1.tar.gz
+```
+
+解压后会生成一个目录，里面包含了所有可运行的程序文件。
+
+3. 修改 masla.sh 中的 Nacos 配置
+   找到和 Nacos 注册中心相关的配置项，按需修改地址、端口、命名空间等参数，确保与实际的 Nacos 服务环境匹配。
+4. 启动 masla gateway
+
+执行启动脚本启动服务：
+```
+sh run.sh start
+
+```
+
+该命令会启动 masla gateway 服务，确认启动成功后即可开始使用。
