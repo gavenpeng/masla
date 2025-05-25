@@ -6,29 +6,71 @@ A fully asynchronous Java API gateway, validated with millions of concurrent C-e
 running only jdk, not dependency other compensate
 
 # Feature
-- Service Discovery
-  Masla API Gateway currently only supports Nacos as the service registry. It performs service discovery via Nacos to automatically detect dynamic changes in services.
 
-- Traffic Control
-  Masla provides built-in support for traffic control. You can configure rate limiting for each API using a token bucket algorithm, which is single-node rate limiting.
 
-- Traffic Circuit Breaking
-  Masla API Gateway has a default circuit breaking mechanism. When the failure rate reaches 50%, circuit breaking is triggered. It supports intelligent auto-upgrade and auto-recovery mechanisms.
+## 🧭 服务发现（Service Discovery）
 
-- Black/White List
-  Service-level support including matching by path, client IP, and header parameters.
+Masla API 网关当前仅支持 **Nacos** 作为服务注册中心。  
+它通过 Nacos 实现服务发现，自动感知服务的动态变更，确保请求始终路由到可用的服务实例。
 
-Global blacklist support.
+---
 
-- Warm-up / Slow Start
-  Supports a slow start mechanism for newly added service instances, similar to TCP slow start, where traffic is gradually increased. Once the warm-up window ends, normal traffic distribution resumes.
+## 🚦 流量控制（Traffic Control）
 
-- Load Balancing
-  Masla provides Round-Robin as the default load balancing strategy.
+Masla 默认支持流量控制，基于 **令牌桶算法** 实现。
 
-- Health Check
-  Requires services to support /healthcheck endpoint. With health check support, zero-downtime deployment can be achieved.
+- 可为每个 API 单独配置限流策略
+- 当前支持的是 **单节点限流**
 
+---
+
+## ⚡ 熔断机制（Traffic Circuit Breaking）
+
+Masla 内置熔断机制：
+
+- 当异常比例达到 **50%** 时自动触发熔断
+- 熔断后流量将不再转发至异常服务
+- 支持智能 **自动升级** 与 **自动恢复**
+
+---
+
+## 🔒 黑白名单（Black/White List）
+
+支持多维度的访问控制：
+
+- 服务级别控制，支持路径（Path）、客户端 IP、Header 参数匹配等方式
+- 支持 **全局黑名单** 配置，统一限制不可信流量源
+
+---
+
+## 🌱 慢启动机制（Warm-up / Slow Start）
+
+针对新加入的服务实例：
+
+- 支持慢启动策略，流量在一段预热窗口内 **逐步增加**
+- 类似 TCP 的慢启动机制
+- 预热窗口结束后进入正常流量分发
+
+---
+
+## 🔁 负载均衡（Load Balancing）
+
+Masla 默认提供 **Round-Robin（轮询）** 负载均衡策略：
+
+- 请求将按顺序分发到所有可用实例
+- 支持后续扩展其他负载均衡策略（如权重、最小连接数等）
+
+---
+
+## ❤️ 健康检查（Health Check）
+
+- 要求服务实现 `/healthcheck` 接口
+- Masla 会定期调用该接口，判断服务健康状态
+- 可用于实现 **无损下线**、**灰度发布**、**零停机部署**
+
+---
+
+如果你需要英文版本、图示说明或补充实际使用案例，也可以告诉我，我可以继续整理。
 
 # Architect
 
