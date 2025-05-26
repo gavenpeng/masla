@@ -95,7 +95,68 @@ tar -zxvf masla-0.0.1.tar.gz
 
 3. 修改 masla.sh 中的 Nacos 配置
    找到和 Nacos 注册中心相关的配置项，按需修改地址、端口、命名空间等参数，确保与实际的 Nacos 服务环境匹配。
-4. 启动 masla gateway
+
+
+4. 配置Nacos
+
+- masla.properties 是masla gateway本身的配置文件，用来配置对外端口，线程数，等其他配置项：
+masla.properties 如下：
+```
+#server config
+masla.server.port=6081
+masla.server.backlog=10340
+masla.server.maxSession=30000
+
+masla.server.protocol.support.https=false
+masla.server.processor.processorCount=10
+masla.server.readTimeout=10000
+masla.server.client.maxConnections=10
+
+#server client
+masla.server.client.io.work.threadCount=10
+masla.server.client.io.work.slow.threadCount=2
+
+#circuit config
+masla.circuit.open.min.request.threshold=1
+masla.circuit.open.trigger.second.threshold=1
+```
+- route.properties 
+route.properties 是gateway的路由配置文件，demo如下：
+
+```
+masla.gateway.routes.service.demo.name=demo
+masla.gateway.routes.service.demo.pattern=^/demo/*
+masla.gateway.routes.service.demo.timeout=2000
+masla.gateway.routes.service.demo.filter.flowLimit.maxfreq=100
+masla.gateway.routes.service.demo.filter.flowLimit.interval=1
+
+masla.gateway.routes.service.gateway.pattern=^/gateway/*
+masla.gateway.routes.service.test1.timeout=1000
+
+#service level black filter
+masla.gateway.routes.service.test1.filter.black.path=/test/xxx/sss
+masla.gateway.routes.service.test1.filter.black.ip=192.168.10.1
+masla.gateway.routes.service.test1.filter.black.queryString.key=RR
+masla.gateway.routes.service.test1.filter.black.queryString.value=RR
+masla.gateway.routes.service.test1.filter.black.header.key=RR
+masla.gateway.routes.service.test1.filter.black.header.value=RR
+
+#service level flowlimit
+masla.gateway.routes.service.test1.filter.flowLimit.path=/demo/echo/test
+masla.gateway.routes.service.test1.filter.flowLimit.maxfreq=1000
+masla.gateway.routes.service.test1.filter.flowLimit.interval=2
+
+#global black filter
+masla.gateway.routes.global.filter.black.path=/demo/echo/test
+masla.gateway.routes.global.filter.black.queryString.key=RR
+masla.gateway.routes.global.filter.black.queryString.value=RR
+masla.gateway.routes.global.filter.black.header.key=test
+masla.gateway.routes.global.filter.black.header.value=black1
+```
+
+
+   
+6. 启动 masla gateway
 
 执行启动脚本启动服务：
 ```
