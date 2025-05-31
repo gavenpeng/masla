@@ -1,9 +1,13 @@
 # Masla
 A fully asynchronous Java API gateway, validated with millions of concurrent C-end users, supporting multiple access protocols including HTTP, HTTPS, and HTTP/2.
 
+# Performance
+
+架构设计经历过C端100万并发流量的验证，基于nacos注册服务发现，微服务路由配置化重新设计，使用更简单。
+
 # Dependency
 
-running only jdk, not dependency other compensate
+only dependency nacos, not dependency other compensate
 
 # Feature
 
