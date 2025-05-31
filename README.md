@@ -99,7 +99,10 @@ tar -zxvf masla-0.0.1.tar.gz
 
 4. 配置Nacos
 
-- masla.properties 是masla gateway本身的配置文件，用来配置对外端口，线程数，等其他配置项：
+ masla.properties 是masla gateway本身的配置文件，用来配置对外端口，线程数，等其他配置项：
+- dataid: masla.properties
+- Group: DEFAULT_GROUP
+
 masla.properties 如下：
 ```
 #server config
@@ -120,7 +123,9 @@ masla.server.client.io.work.slow.threadCount=2
 masla.circuit.open.min.request.threshold=1
 masla.circuit.open.trigger.second.threshold=1
 ```
-- route.properties 
+- dataid: route.properties 
+- Group: DEFAULT_GROUP
+  
 route.properties 是gateway的路由配置文件，demo如下：
 
 ```
