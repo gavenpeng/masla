@@ -123,6 +123,7 @@ masla.server.client.io.work.slow.threadCount=2
 masla.circuit.open.min.request.threshold=1
 masla.circuit.open.trigger.second.threshold=1
 ```
+接入业务的路由配置文件route.properties, 负责service的路由，限流，黑白名单的配置
 - dataid: route.properties 
 - Group: DEFAULT_GROUP
   
