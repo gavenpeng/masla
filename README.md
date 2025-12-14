@@ -73,7 +73,36 @@ Masla 默认提供 **Round-Robin（轮询）** 负载均衡策略：
 - 可用于实现 **无损下线**、**灰度发布**、**零停机部署**
 
 ---
+## ❤️ Metrics export
 
+### API指标 (masla_api_*)
+
+所有API指标都包含以下标签:
+- `service_name`: 应用名称
+- `service_id`: 服务ID
+- `host`: 主机地址
+
+主要指标:
+- `masla_api_qps_total`: API QPS总数
+- `masla_api_peak_qps_total`: 峰值QPS
+- `masla_api_success_total`: 成功请求数
+- `masla_api_timeout_total`: 超时请求数
+- `masla_api_reject_total`: 拒绝请求数
+- `masla_api_4xx_total`: 4XX状态码数量
+- `masla_api_5xx_total`: 5XX状态码数量
+- `masla_api_circuit_total`: 熔断次数
+- `masla_api_flow_control_total`: 流控次数
+- `masla_api_latency_tp50_ms`: TP50延迟（毫秒）
+- `masla_api_latency_tp90_ms`: TP90延迟（毫秒）
+- `masla_api_latency_tp99_ms`: TP99延迟（毫秒）
+- `masla_api_in_bandwidth_bytes`: 入站带宽（字节）
+- `masla_api_out_bandwidth_bytes`: 出站带宽（字节）
+
+### Session指标 (masla_session_*)
+
+- `masla_session_total`: 总Session数
+- `masla_session_https1_total`: HTTP/1.1 Session数
+- `masla_session_https2_total`: HTTP/2 Session数
 
 # Architect
 
