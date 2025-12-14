@@ -74,8 +74,7 @@ Masla 默认提供 **Round-Robin（轮询）** 负载均衡策略：
 
 ---
 ## ❤️ Metrics export
-> 支持prometheus 上报，可以通过访问：http://localhost:port/
-actuator/prometheus 查看metric数据。
+> 支持prometheus 上报，可以通过访问：http://localhost:port/actuator/prometheus 查看metric数据,port是gateway配置的端口
 
 ### API指标 (masla_api_*)
 
