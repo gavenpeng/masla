@@ -50,6 +50,13 @@ public class MaslaSpringContextUtil implements ApplicationContextAware {
         return null;
     }
 
+    public static <T> T getBean(Class<T> name) throws BeansException {
+        if(applicationContext != null) {
+            return applicationContext.getBean(name);
+        }
+        return null;
+    }
+
     public static MaslaConfConfig getMaslaConfConfigBean() {
         if(applicationContext != null) {
             return (MaslaConfConfig)applicationContext.getBean("maslaConfConfig");

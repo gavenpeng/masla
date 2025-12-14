@@ -110,9 +110,12 @@ public class CircuitRuleDefine {
 
         this.circuitTriggerPercent = circuitTriggerPercent;
         //默认30秒检查一次
-        this.circuitTriggerSecond =  MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitTriggerSecond();
-        this.circuitThreshold = MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitOpenMinRequestThreshold();
-        this.upgradeOrDown = AUTO_UPGRADE_OR_DOWN_OPEN.equals(MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitAutoUpgradeOrDownSwitch())? 1 : 0;
+        //this.circuitTriggerSecond =  MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitTriggerSecond();
+        this.circuitTriggerSecond =  10;
+//        this.circuitThreshold = MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitOpenMinRequestThreshold();
+        this.circuitThreshold = 100;
+//        this.upgradeOrDown = AUTO_UPGRADE_OR_DOWN_OPEN.equals(MaslaSpringContextUtil.getMaslaConfConfigBean().getCircuitAutoUpgradeOrDownSwitch())? 1 : 0;
+        this.upgradeOrDown = 1;
         this.circuitAttendWindow = DEFAULT_SLEEP_WINDOW_TIME;
         this.circuit = CircuitConfig.MIDDLE_PERCENT_LEVEL;//默认从50%开始熔断
         this.appName = appName;

@@ -73,8 +73,9 @@ public class NacosRouteConfig {
         if (password == null || password.isEmpty()) {
             throw new MaslaException("Masla gateway not found nacos server password params!!!");
         }
+
         if (namespace == null || namespace.isEmpty()) {
-            throw new MaslaException("Masla gateway not found nacos server namespace params!!!");
+           log.info("namespace is empty, so use the default namespace public");
         }
 
         Properties nacosProperties = new Properties();

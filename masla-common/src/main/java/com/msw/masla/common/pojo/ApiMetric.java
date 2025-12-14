@@ -25,8 +25,6 @@ public class ApiMetric {
 
     private static final long METRIC_INTERVAL = 5 * 60 * 1000l;
 
-//    private String appName;
-//    private long appId;
     private String serviceId;
     private String host;
     private AtomicLong waitCost = new AtomicLong(0);//队列等待时间
@@ -58,9 +56,6 @@ public class ApiMetric {
 
     //用户自定义响应码统计
     private AtomicLong codeAppDefine = new AtomicLong(0);
-
-
-
 
     //后端应用拒绝连接数量
     private AtomicLong connRefusedNums = new AtomicLong(0);

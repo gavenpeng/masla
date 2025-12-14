@@ -237,7 +237,7 @@ public class ApiMetricResponseProcessor extends AbstractHeaderResponseProcessor 
 
             DomainMetrics
                     .countQueryAndInBandwidth(appDO.getId(),appDO.getName(), domain, clientIp, totalBandWidthSize, 1, IOTDevice.getInstance(),
-                            isRetry,sessionType,hitExtendHeaderList,requestContext.getResponseContentLength(), dc, getIpv6Qps(realIp));
+                            isRetry,sessionType,hitExtendHeaderList,requestContext.getResponseContentLength());
             DomainMetrics.countOutBandwidth(appDO.getId(),appDO.getName(), domain, clientIp, requestContext.getResponseContentLength());
 
 

@@ -40,6 +40,8 @@ public class MaslaServerConfig {
     @NacosValue(value = "${masla.server.protocol.support.https:false}", autoRefreshed = true)
     private boolean supportHttps;
 
+
+
     @NacosValue(value = "${masla.server.client.io.work.threadCount:5}", autoRefreshed = true)
     private Integer ioThreadCount;
 
@@ -139,6 +141,12 @@ public class MaslaServerConfig {
 
     @NacosValue(value = "${masla.service.healthcheck.disabled:true}", autoRefreshed = true)
     private boolean serviceHealthcheckDisabled;
+
+    @NacosValue(value = "${masla.metrics.prometheus.enabled:false}", autoRefreshed = true)
+    private boolean metricEnabled;
+
+    @NacosValue(value = "${masla.metrics.prometheus.path:/prometheus}", autoRefreshed = true)
+    private String prometheusPath;
 
     public void setPort(Integer port) {
         this.port = port;

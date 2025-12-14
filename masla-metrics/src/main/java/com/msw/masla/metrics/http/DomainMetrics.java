@@ -92,7 +92,7 @@ public class DomainMetrics extends AbstractMetrics {
       domainCountList.add(domainCount);
 
       if (System.currentTimeMillis() - count.getLastUpdateTime() > EXPIRE_TIME) {
-        removedKeyList.add(generateKey(count.getApp(), count.getDomain(), count.getNginxIp(), count.getDc()));
+        removedKeyList.add(generateKey(count.getApp(), count.getDomain(), count.getNginxIp()));
       }
     }
 
@@ -109,7 +109,7 @@ public class DomainMetrics extends AbstractMetrics {
     if (StringUtils.isEmpty(domain) || StringUtils.isEmpty(ip) || StringUtils.isEmpty(app)) {
       return;
     }
-    String key = generateKey(app, domain, ip, dc);
+    String key = generateKey(app, domain, ip);
     DomainCount count = domainCountMap.get(key);
     if (null == count) {
       if (domainCountMap.size() <= SIZE_LIMIT) {
@@ -133,14 +133,13 @@ public class DomainMetrics extends AbstractMetrics {
   }
 
   public static void countQueryAndInBandwidth(Long appId, String app, String domain, String ip,
-                                              long inBandwidth, long qps, IOTDevice iotDevice, boolean isRetryReq, Integer sessionType, List<String> hitHeaders, long outBandwidth,
-                                              String dc, long ipv6Qps) {
+                                              long inBandwidth, long qps, IOTDevice iotDevice, boolean isRetryReq, Integer sessionType, List<String> hitHeaders, long outBandwidth) {
     if (StringUtils.isEmpty(domain) || StringUtils.isEmpty(ip) || StringUtils.isEmpty(app)) {
       return;
     }
 
     if(domain.endsWith(COM_DOMAIN_SUFFIX)){
-      String key = generateKey(app, domain, ip, dc);
+      String key = generateKey(app, domain, ip);
       DomainCount count = domainCountMap.get(key);
       if (count == null) {
         if (domainCountMap.size() <= SIZE_LIMIT) {
@@ -149,18 +148,14 @@ public class DomainMetrics extends AbstractMetrics {
           domainCount.setApp(app);
           domainCount.setNginxIp(ip);
           domainCount.setDomain(domain);
-          // 机房
-          domainCount.setDc(dc);
           domainCount.getInBandwidth().addAndGet(inBandwidth);
           domainCount.getOutBandwidth().addAndGet(outBandwidth);
           domainCount.getQueryCount().addAndGet(qps);
-          domainCount.getIpv6Qps().addAndGet(ipv6Qps);
           DomainCount preCount = domainCountMap.putIfAbsent(key, domainCount);
           if (preCount != null) {
             preCount.getInBandwidth().addAndGet(inBandwidth);
             preCount.getOutBandwidth().addAndGet(outBandwidth);
             preCount.getQueryCount().addAndGet(qps);
-            preCount.getIpv6Qps().addAndGet(ipv6Qps);
             setDeviceTypeQpsAndBW(preCount,iotDevice,qps,inBandwidth,isRetryReq,sessionType,hitHeaders);
           }else{
             setDeviceTypeQpsAndBW(domainCount,iotDevice,qps,inBandwidth,isRetryReq,sessionType,hitHeaders);
@@ -171,7 +166,6 @@ public class DomainMetrics extends AbstractMetrics {
         count.getInBandwidth().addAndGet(inBandwidth);
         count.getOutBandwidth().addAndGet(outBandwidth);
         count.getQueryCount().addAndGet(qps);
-        count.getIpv6Qps().addAndGet(ipv6Qps);
         setDeviceTypeQpsAndBW(count,iotDevice,qps,inBandwidth,isRetryReq,sessionType,hitHeaders);
         count.setLastUpdateTime(System.currentTimeMillis());
       }
@@ -276,7 +270,7 @@ public class DomainMetrics extends AbstractMetrics {
     }
   }
 
-  private static String generateKey(String app, String domain, String ip, String dc) {
-    return app + domain + ip + dc;
+  private static String generateKey(String app, String domain, String ip) {
+    return app + domain + ip;
   }
 }

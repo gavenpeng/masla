@@ -22,6 +22,8 @@ public class Constants {
 
 	public static final String MASLA_API_PATH = "/masla";
 
+	public static final String MASLA_ACTUATOR_ROOT = "/actuator";
+
 	public static final String MASLA_COMMON_MATCH_PATH = "/.*";
 
 	public static final String MASLA_MONITOR_PATH = "/monitor";

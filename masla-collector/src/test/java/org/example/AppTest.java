@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package com.msw.masla;
+package org.example;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

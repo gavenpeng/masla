@@ -51,7 +51,6 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
     private AbstractEndpoint endpoint;
     private static volatile MaslaServerDispatch instance;
 
-
     private MaslaServerDispatch(AbstractEndpoint endpoint){
         this.endpoint = endpoint;
         this.containerFactory = MaslaFilterBeanFactory.getInstance();
@@ -81,7 +80,6 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
 
 
         MaslaServerConfig maslaServerConfig = (MaslaServerConfig) MaslaSpringContextUtil.getBean("maslaServerConfig");
-        LOG.info("Server config port:{}", maslaServerConfig.getPort());
 
         //the app's health check
         if (session.getContextRoot().equals(Constants.MASLA_HEALTHCHECK_PATH_END)
@@ -93,11 +91,31 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
             return;
         }
 
+        if (session.getContextRoot().equals(Constants.MASLA_ACTUATOR_ROOT)
+                && session.getPath().equals(maslaServerConfig.getPrometheusPath())) {
+            MaslaServlet prometheusServlet = getMaslaServlet(requestPath);
+            if (prometheusServlet == null) {
+                LOG.error("Masla not support prometheus metrics!!!");
+                session.writeError(HttpResponseStatus.INTERNAL_SERVER_ERROR,true);
+                reqContext.getEvent().recycle();
+                reqContext.recycle();
+                return;
+            }
+            try {
+                prometheusServlet.service(reqContext, event);
+            } catch (Throwable e) {
+                LOG.error("Masla failed to export Prometheus metrics:", e);
+                reqContext.getEvent().recycle();
+                reqContext.recycle();
+                session.writeError(HttpResponseStatus.INTERNAL_SERVER_ERROR,true);
+            }
+            return;
+        }
 
         //Select matcher filter
         List<MaslaFilter> matcherFilter = null;
         List<Pattern> filterList = this.containerFactory.getFilterMappingList();
-        if(filterList != null && filterList.size() > 0){
+        if(filterList != null && !filterList.isEmpty()){
             matcherFilter = new ArrayList<MaslaFilter>(10);
             for(Pattern filterMapping:filterList){
                if(filterMapping.matcher(requestPath).matches()){
@@ -115,21 +133,7 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
         }
 
         //Select matcher servelet
-        MaslaServlet servlet = null;
-        List<Pattern> servletList = this.containerFactory.getServletMappingList();
-        if(servletList != null && !servletList.isEmpty()){
-            for(Pattern servletMapping:servletList){
-                if(servletMapping.matcher(requestPath).matches()){
-                    try {
-                        servlet = containerFactory.getServlet(servletMapping.pattern());
-                        break;
-                    }catch (Throwable e){
-                        LOG.error("Masla server load servlet failed:",e);
-                        break;
-                    }
-                }
-            }
-        }
+        MaslaServlet servlet = getMaslaServlet(requestPath);
 
         if(servlet == null){
             LOG.error("Masla can not mapping a servlet for request {}",request.uri());
@@ -161,7 +165,27 @@ public class MaslaServerDispatch extends AbstractHttpDispatch {
 
     }
 
-
+    /**
+     * Get Servlet by path
+     * @param requestPath request path
+     * @return MaslaServlet
+     */
+    private MaslaServlet getMaslaServlet(String requestPath) {
+        List<Pattern> servletList = this.containerFactory.getServletMappingList();
+        if (servletList != null && !servletList.isEmpty()) {
+            for(Pattern servletMapping:servletList){
+                if (servletMapping.matcher(requestPath).matches()) {
+                    try {
+                        return containerFactory.getServlet(servletMapping.pattern());
+                    }catch (Throwable e){
+                        LOG.error("Masla server load servlet failed:",e);
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
 
 }

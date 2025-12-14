@@ -131,13 +131,13 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
             }else {
                 channelFuture.addListener(new AsyncConnRequestCallback(httpRequest, channelPool, maslaContext, event));
             }
-        }catch (NoAvailableConnectionException e){
+        } catch (NoAvailableConnectionException e){
             LOG.error("Masla found request {} no available connection",httpRequest.uri(),e);
             localExecFailed(maslaContext,e);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e){
             LOG.error("Masla found request {} protocol not support",httpRequest.uri());
             localExecFailed(maslaContext,e);
-        }catch (NoAvailableHostException e){
+        } catch (NoAvailableHostException e){
 
             String serviceIdentify = maslaContext.getServiceIdentify();
             if (serviceIdentify != null) {
@@ -148,7 +148,7 @@ public class ClusterProxyAsyncInvoker extends AbstractProxyInvoker {
             }
             LOG.error("Masla found request {} no available host",httpRequest.uri());
             localExecFailed(maslaContext,e);
-        }catch (Throwable e){
+        } catch (Throwable e){
             LOG.error("Masla send http request {} failed:",httpRequest.uri(), e);
             if(checkNettyQueueFullException(e)){
                 countQueueFull(maslaContext);

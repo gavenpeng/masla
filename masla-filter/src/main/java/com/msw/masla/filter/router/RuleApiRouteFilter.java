@@ -134,11 +134,12 @@ public class RuleApiRouteFilter implements MaslaFilter {
 
         String reqPath = path.length() > 0 ? path : contextRoot;
         serviceIdentify = ServiceIdFormatUtil.formatServerId(path, context);
-        if(ServiceIdFormatUtil.isUNvalidUrl(reqPath)){
+        if (ServiceIdFormatUtil.isUNvalidUrl(reqPath)) {
             serviceIdentify = Constants.UNVALID_SERVICE_PATH;
-        }else if(reqPath.endsWith(Constants.ICO_REQUEST)||
-                reqPath.equals(Constants.HTTP_SCHEMA)){
-            serviceIdentify =  reqPath;
+        } else if (reqPath.endsWith(Constants.ICO_REQUEST) ||
+                reqPath.equals(Constants.HTTP_SCHEMA)) {
+            writeDefaultResponse(context);
+            return;
         }
 
         maslaAsyncContext.setServiceIdentify(serviceIdentify);
@@ -217,6 +218,11 @@ public class RuleApiRouteFilter implements MaslaFilter {
         String unvalidRoute = "Not found service by request url:" + requestContext.getRequestUrl();
         requestContext.getSession().writeAndClose(
                 MaslaHttpUtil.createResponse(HttpResponseStatus.BAD_REQUEST, unvalidRoute, Constants.MASLA_RESPONSE_HEADER_UNVALID_PATH));
+    }
+
+    private void writeDefaultResponse(SessionContext<IOSession, HttpRequest, HttpResponse> requestContext) {
+        requestContext.getSession().writeAndClose(
+                MaslaHttpUtil.createResponse(HttpResponseStatus.OK));
     }
 
 }

@@ -17,6 +17,7 @@ package com.msw.masla.core.router.rule;
 
 import com.msw.masla.common.constant.Constants;
 import com.msw.masla.common.pojo.ServiceApp;
+import com.msw.masla.common.pojo.ServiceAppCache;
 import com.msw.masla.common.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,6 +102,8 @@ public class RouteRuleCache  {
             serviceApp.setName(routeRule.getAppName());
             serviceApp.setLoadBalanceName(routeRule.getLoadBalance());
             serviceApp.initDefaultCircuit();
+
+            ServiceAppCache.registerServiceApp(serviceApp);
 
             if (!ROUTE_APP_CACHE.containsKey(routeRule.getAppName())) {
                 ROUTE_APP_CACHE.put(routeRule.getAppName(), serviceApp);
